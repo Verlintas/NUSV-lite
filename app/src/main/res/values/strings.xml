@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NUSV LITE</string>
+    <string name="discover_title">Discover</string>
+    <string name="discover_subtitle">小工具 &amp; 游戏</string>
+    <string name="home_title">NUSV</string>
+    <string name="home_search">搜索项目…</string>
+    <string name="home_featured">精选</string>
+    <string name="settings_title">设置</string>
+    <string name="settings_theme">主题</string>
+    <string name="settings_haptics">触觉反馈</string>
+    <string name="settings_sync">同步</string>
+    <string name="settings_about">关于</string>
+    <string name="settings_version">版本</string>
+    <string name="settings_powered">Powered by NUSV</string>
+    <string name="settings_language">语言</string>
+    <string name="cat_all">全部</string>
+    <string name="cat_games">游戏</string>
+    <string name="cat_utilities">实用工具</string>
+    <string name="cat_devtools">开发工具</string>
+    <string name="cat_other">其他</string>
+</resources>

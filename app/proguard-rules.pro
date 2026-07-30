@@ -1,0 +1,2 @@
+-keep class com.nusv.lite.model.** { *; }
+-keepattributes *Annotation*

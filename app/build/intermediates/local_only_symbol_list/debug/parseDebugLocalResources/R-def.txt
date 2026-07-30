@@ -1,0 +1,29 @@
+R_DEF: Internal format may change without notice
+local
+color splash_background
+color splash_background_night
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+string cat_all
+string cat_devtools
+string cat_games
+string cat_other
+string cat_utilities
+string discover_subtitle
+string discover_title
+string home_featured
+string home_search
+string home_title
+string settings_about
+string settings_haptics
+string settings_language
+string settings_powered
+string settings_sync
+string settings_theme
+string settings_title
+string settings_version
+style Theme.NusvLite
+style Theme.NusvLite.App

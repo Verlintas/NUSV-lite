@@ -1,0 +1,49 @@
+{
+  "version": 3,
+  "updatedAt": "2026-07-30T00:00:00Z",
+  "categories": [
+    {"id": "featured", "name": "Featured", "color": "#FF2D78"}
+  ],
+  "items": [
+    {
+      "id": "1",
+      "title": "NUSV Portal",
+      "description": "NUSV 主站，一切内容从这里开始",
+      "url": "https://nusv.mysxl.cn/",
+      "categoryId": "featured",
+      "tags": ["portal", "main"],
+      "isFeatured": true,
+      "createdAt": "2026-07-29T12:00:00Z"
+    },
+    {
+      "id": "2",
+      "title": "ELECUSV",
+      "description": "USV 电子中心，网址集合站",
+      "url": "https://elecusv.mysxl.cn/",
+      "categoryId": "featured",
+      "tags": ["portal", "links"],
+      "isFeatured": true,
+      "createdAt": "2026-07-29T08:00:00Z"
+    },
+    {
+      "id": "3",
+      "title": "RedServer",
+      "description": "为 Java 版 Minecraft 提供服务的私人服务器",
+      "url": "https://usvserver.mysxl.cn/",
+      "categoryId": "featured",
+      "tags": ["minecraft", "server"],
+      "isFeatured": true,
+      "createdAt": "2026-07-29T06:00:00Z"
+    },
+    {
+      "id": "4",
+      "title": "NUSV LITE",
+      "description": "NUSV 官方安卓客户端，把 NUSV 生态装进口袋",
+      "url": "",
+      "categoryId": "featured",
+      "tags": ["android", "app"],
+      "isFeatured": true,
+      "createdAt": "2026-07-29T00:00:00Z"
+    }
+  ]
+}

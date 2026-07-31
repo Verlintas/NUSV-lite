@@ -40,9 +40,20 @@ import java.util.Calendar
 import kotlin.math.PI
 import kotlin.math.sin
 
+private fun normalized(c: Calendar): Calendar = Calendar.getInstance().apply {
+    timeInMillis = c.timeInMillis
+    set(Calendar.HOUR_OF_DAY, 0)
+    set(Calendar.MINUTE, 0)
+    set(Calendar.SECOND, 0)
+    set(Calendar.MILLISECOND, 0)
+}
+
+private fun daysInMonth(year: Int, month: Int): Int = Calendar.getInstance().apply {
+    set(year, month, 1)
+}.getActualMaximum(Calendar.DAY_OF_MONTH)
+
 private fun calculateBiorhythm(birthDate: Calendar, targetDate: Calendar, cycle: Int): Double {
-    val diff = (targetDate.timeInMillis - birthDate.timeInMillis) / (1000 * 60 * 60 * 24)
-    val days = diff.toInt()
+    val days = ((normalized(targetDate).timeInMillis - normalized(birthDate).timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
     val radians = 2 * PI * days / cycle
     return sin(radians) * 100
 }
@@ -79,37 +90,33 @@ fun Biorhythm(onBack: () -> Unit) {
         Spacer(Modifier.height(8.dp))
         DatePicker("Month", birthMonth, { if (birthMonth > 1) birthMonth-- }, { if (birthMonth < 12) birthMonth++ })
         Spacer(Modifier.height(8.dp))
-        DatePicker("Day", birthDay, { if (birthDay > 1) birthDay-- }, { if (birthDay < 31) birthDay++ })
+        DatePicker("Day", birthDay, { if (birthDay > 1) birthDay-- }, { if (birthDay < daysInMonth(birthYear, birthMonth)) birthDay++ })
 
         Spacer(Modifier.height(20.dp))
 
         val birthDate = remember(birthYear, birthMonth, birthDay) {
             Calendar.getInstance().apply {
-                set(birthYear, birthMonth - 1, birthDay)
+                set(birthYear, birthMonth - 1, birthDay, 0, 0, 0)
+                set(Calendar.MILLISECOND, 0)
             }
         }
 
-        val scores = remember(birthDate) {
-            val now = Calendar.getInstance()
-            listOf(
-                Triple("Physical", calculateBiorhythm(birthDate, now, 23), Color.Red),
-                Triple("Emotional", calculateBiorhythm(birthDate, now, 28), Color.Blue),
-                Triple("Intellectual", calculateBiorhythm(birthDate, now, 33), Color.Green),
-            )
-        }
+        val now = Calendar.getInstance()
+        val scores = listOf(
+            Triple("Physical", calculateBiorhythm(birthDate, now, 23), Color.Red),
+            Triple("Emotional", calculateBiorhythm(birthDate, now, 28), Color.Blue),
+            Triple("Intellectual", calculateBiorhythm(birthDate, now, 33), Color.Green),
+        )
 
-        val criticalDays = remember(birthDate) {
-            val now = Calendar.getInstance()
-            mutableListOf<Int>().apply {
-                for (day in 0..30) {
-                    val cal = now.clone() as Calendar
-                    cal.add(Calendar.DAY_OF_YEAR, day)
-                    for (cycle in listOf(23, 28, 33)) {
-                        val bio = calculateBiorhythm(birthDate, cal, cycle)
-                        if (kotlin.math.abs(bio) < 5.0) {
-                            add(day)
-                            break
-                        }
+        val criticalDays = mutableListOf<Int>().apply {
+            for (day in 0..30) {
+                val cal = now.clone() as Calendar
+                cal.add(Calendar.DAY_OF_YEAR, day)
+                for (cycle in listOf(23, 28, 33)) {
+                    val bio = calculateBiorhythm(birthDate, cal, cycle)
+                    if (kotlin.math.abs(bio) < 5.0) {
+                        add(day)
+                        break
                     }
                 }
             }

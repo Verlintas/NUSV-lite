@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import com.nusv.lite.util.LocalAppStrings
 import com.nusv.lite.repository.AppRepository
 import com.nusv.lite.ui.components.NusvChip
 import com.nusv.lite.util.performIfEnabled
@@ -34,6 +35,7 @@ fun BrowseScreen(
     repository: AppRepository,
     onItemClick: (String) -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val haptic = LocalHapticFeedback.current
     val categories by repository.allCategories.collectAsState(initial = emptyList())
     var selectedCategoryId by remember { mutableStateOf<String?>(null) }
@@ -51,7 +53,7 @@ fun BrowseScreen(
         item {
             Spacer(Modifier.height(24.dp))
             Text(
-                text = "Browse",
+                text = strings.browseBrowse,
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
@@ -63,7 +65,7 @@ fun BrowseScreen(
             ) {
                 item {
                     NusvChip(
-                        text = "All",
+                        text = strings.browseAll,
                         selected = selectedCategoryId == null,
                         onClick = { haptic.performIfEnabled(); selectedCategoryId = null }
                     )
@@ -82,6 +84,7 @@ fun BrowseScreen(
         items(items) { item ->
             ItemRow(
                 item = item,
+                strings = strings,
                 onClick = { haptic.performIfEnabled(); onItemClick(item.id) }
             )
         }

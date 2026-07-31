@@ -250,8 +250,11 @@ fun WordleGame(onBack: () -> Unit) {
                     Key.Enter -> { submitGuess(); true }
                     Key.Backspace -> { onDelete(); true }
                     else -> {
-                        val c = event.key.toString().firstOrNull()?.uppercase()?.firstOrNull()
-                        if (c != null && c in 'A'..'Z') { onKeyPress(c); true }
+                        val code = event.nativeKeyEvent.keyCode
+                        val c = if (code in android.view.KeyEvent.KEYCODE_A..android.view.KeyEvent.KEYCODE_Z) {
+                            'A' + (code - android.view.KeyEvent.KEYCODE_A)
+                        } else null
+                        if (c != null) { onKeyPress(c); true }
                         else false
                     }
                 }

@@ -73,7 +73,7 @@ fun DetailScreen(
     val currentItem = item
     if (currentItem == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Loading...")
+            Text(strings.detailLoading)
         }
         return
     }
@@ -113,7 +113,7 @@ fun DetailScreen(
                 IconButton(onClick = { haptic.performIfEnabled(); onBack() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = strings.cdBack,
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
@@ -166,7 +166,7 @@ fun DetailScreen(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                text = "Added ${formatDate(currentItem.createdAt)}",
+                text = strings.detailAddedOn.format(formatDate(currentItem.createdAt)),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -212,7 +212,7 @@ fun DetailScreen(
                         modifier = Modifier.padding(end = 8.dp)
                     )
                     Text(
-                        text = if (checking) "Checking..." else strings.detailCheckUpdate,
+                        text = if (checking) strings.detailChecking else strings.detailCheckUpdate,
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -224,14 +224,14 @@ fun DetailScreen(
                         title = { Text("NUSV LITE") },
                         text = {
                             if (checkError) {
-                                Text("Could not check for updates.\n\nManual update: download the latest APK from the NUSV Portal and install.")
+                                Text(strings.updateCheckFailed.format("NUSV Portal"))
                             } else if (info != null) {
                                 val currentVer = "1.0.0"
                                 val hasUpdate = info.latestVersion != currentVer
                                 Column {
                                     Text(
-                                        if (hasUpdate) "Update available: v${info.latestVersion}"
-                                        else "Already up to date (v$currentVer)"
+                                        if (hasUpdate) strings.updateAvailable.format(info.latestVersion)
+                                        else strings.updateUpToDate.format(currentVer)
                                     )
                                     if (info.changelog.isNotBlank()) {
                                         Spacer(Modifier.height(8.dp))
@@ -243,12 +243,12 @@ fun DetailScreen(
                                     }
                                 }
                             } else {
-                                Text("Manual update: download the latest APK from the NUSV Portal and install.")
+                                Text(strings.updateManual.format("NUSV Portal"))
                             }
                         },
                         confirmButton = {
                             Button(onClick = { haptic.performIfEnabled(); showUpdateDialog = false }) {
-                                Text("OK")
+                                Text(strings.okLabel)
                             }
                         },
                         dismissButton = {
@@ -259,7 +259,7 @@ fun DetailScreen(
                                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(updateInfo!!.downloadUrl))
                                     context.startActivity(intent)
                                 }) {
-                                    Text("Download")
+                                    Text(strings.downloadLabel)
                                 }
                             }
                         }

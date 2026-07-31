@@ -73,7 +73,7 @@ fun SleepCalc(onBack: () -> Unit) {
             val minutes = (wakeMinutes - total + 1440) % 1440
             val bh = minutes / 60
             val bm = minutes % 60
-            sb.appendLine(strings.sleepCycle.format(cycle) + ": " + formatTime(bh, bm))
+            sb.appendLine(strings.sleepCycle.format(cycle, total) + ": " + formatTime(bh, bm))
         }
         result = sb.toString()
         SoundManager.playSuccess()
@@ -92,7 +92,7 @@ fun SleepCalc(onBack: () -> Unit) {
             val minutes = (bedMinutes + total) % 1440
             val wh = minutes / 60
             val wm = minutes % 60
-            sb.appendLine(strings.sleepCycle.format(cycle) + ": " + formatTime(wh, wm))
+            sb.appendLine(strings.sleepCycle.format(cycle, total) + ": " + formatTime(wh, wm))
         }
         result = sb.toString()
         SoundManager.playSuccess()

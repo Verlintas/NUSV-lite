@@ -61,11 +61,21 @@ private val textToMorse = mapOf(
 private val morseToText = textToMorse.entries.associate { (k, v) -> v to k.toString() }
 
 fun textToMorseCode(text: String): String {
-    return text.uppercase().map { c -> textToMorse[c] ?: c.toString() }.joinToString(" ")
+    return text.uppercase().map { c ->
+        when {
+            c == ' ' -> "/"
+            else -> textToMorse[c] ?: c.toString()
+        }
+    }.joinToString(" ")
 }
 
 fun morseToTextCode(morse: String): String {
-    return morse.split(" ").map { code -> morseToText[code] ?: code }.joinToString("")
+    return morse.split(" ").map { code ->
+        when (code) {
+            "/" -> " "
+            else -> morseToText[code] ?: code
+        }
+    }.joinToString("")
 }
 
 private fun vibrate(vibrator: Vibrator, ms: Long) {

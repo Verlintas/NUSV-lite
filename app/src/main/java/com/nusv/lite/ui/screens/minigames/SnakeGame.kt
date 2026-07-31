@@ -63,7 +63,6 @@ fun SnakeGame(onBack: () -> Unit) {
     val rows = 24
     var snake by remember { mutableStateOf(listOf(Point(8, 12), Point(7, 12), Point(6, 12))) }
     var food by remember { mutableStateOf(Point(12, 12)) }
-    var direction by remember { mutableStateOf(Direction.RIGHT) }
     var nextDirection by remember { mutableStateOf(Direction.RIGHT) }
     var score by remember { mutableIntStateOf(0) }
     var gameOver by remember { mutableStateOf(false) }
@@ -85,7 +84,6 @@ fun SnakeGame(onBack: () -> Unit) {
 
     fun reset() {
         snake = listOf(Point(8, 12), Point(7, 12), Point(6, 12))
-        direction = Direction.RIGHT
         nextDirection = Direction.RIGHT
         score = 0
         gameOver = false
@@ -102,9 +100,8 @@ fun SnakeGame(onBack: () -> Unit) {
         if (gameOver || isPaused) return@LaunchedEffect
         while (true) {
             delay((120 - minOf(score, 10) * 8).toLong().coerceAtLeast(60))
-            direction = nextDirection
             val head = snake.first()
-            val newHead = when (direction) {
+            val newHead = when (nextDirection) {
                 Direction.UP -> Point(head.x, head.y - 1)
                 Direction.DOWN -> Point(head.x, head.y + 1)
                 Direction.LEFT -> Point(head.x - 1, head.y)
@@ -212,12 +209,13 @@ fun SnakeGame(onBack: () -> Unit) {
                         val head = snake.first()
                         val dx = cx - head.x
                         val dy = cy - head.y
+                        val current = nextDirection
                         if (abs(dx) > abs(dy)) {
-                            if (dx > 0 && direction != Direction.LEFT) nextDirection = Direction.RIGHT
-                            else if (dx < 0 && direction != Direction.RIGHT) nextDirection = Direction.LEFT
+                            if (dx > 0 && current != Direction.LEFT) nextDirection = Direction.RIGHT
+                            else if (dx < 0 && current != Direction.RIGHT) nextDirection = Direction.LEFT
                         } else {
-                            if (dy > 0 && direction != Direction.UP) nextDirection = Direction.DOWN
-                            else if (dy < 0 && direction != Direction.DOWN) nextDirection = Direction.UP
+                            if (dy > 0 && current != Direction.UP) nextDirection = Direction.DOWN
+                            else if (dy < 0 && current != Direction.DOWN) nextDirection = Direction.UP
                         }
                     }
                 },

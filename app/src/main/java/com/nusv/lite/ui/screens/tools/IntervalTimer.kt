@@ -135,7 +135,7 @@ fun IntervalTimer(onBack: () -> Unit) {
                     if (running) {
                         running = false
                     } else {
-                        if (remaining <= 0) {
+                        if (remaining <= 0 || (isWork && remaining > workSeconds) || (!isWork && remaining > restSeconds)) {
                             isWork = true
                             currentRound = 1
                             remaining = workSeconds

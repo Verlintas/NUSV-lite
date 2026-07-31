@@ -146,20 +146,21 @@ fun Sudoku(onBack: () -> Unit) {
     var generating by remember { mutableStateOf(false) }
     var generatingFor by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
-    var genJob: kotlinx.coroutines.Job? = null
+    var genJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
 
     fun startNewGame() {
         genJob?.cancel()
-        genJob = null
         generating = true
         generatingFor = difficulty
         genJob = scope.launch {
-            val removeCount = when (difficulty) {
+            val target = generatingFor
+            val removeCount = when (target) {
                 0 -> 38
                 1 -> 48
                 else -> 56
             }
             val (p, s) = withContext(Dispatchers.Default) { generateSudoku(removeCount) }
+            if (target != generatingFor) return@launch
             puzzle = p.map { it.copyOf() }.toTypedArray()
             solution = s
             current = p.map { it.copyOf() }.toTypedArray()
@@ -353,7 +354,7 @@ fun Sudoku(onBack: () -> Unit) {
             Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
         }
         Text(
-            text = "${strings.gameWins}: $solvedCount",
+            text = strings.gameWinsCount.format(solvedCount),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

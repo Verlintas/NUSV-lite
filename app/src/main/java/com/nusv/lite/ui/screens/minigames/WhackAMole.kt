@@ -1,7 +1,6 @@
 package com.nusv.lite.ui.screens.minigames
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -42,8 +41,6 @@ import com.nusv.lite.util.LocalAppStrings
 import com.nusv.lite.util.PointsManager
 import com.nusv.lite.util.performIfEnabled
 import kotlinx.coroutines.delay
-import kotlin.math.cos
-import kotlin.math.sin
 import kotlin.random.Random
 
 @Composable
@@ -52,49 +49,41 @@ fun WhackAMole(onBack: () -> Unit) {
     val strings = LocalAppStrings.current
     val ctx = LocalContext.current
     val gridSize = 3
-    val moles = remember { mutableStateListOf<Int>() }
     var score by remember { mutableIntStateOf(0) }
     var timeLeft by remember { mutableIntStateOf(30) }
     var gameRunning by remember { mutableStateOf(false) }
     var gameOver by remember { mutableStateOf(false) }
-    var lastHit by remember { mutableIntStateOf(-1) }
-    var hitAnim by remember { mutableStateOf(0) }
     var highScore by remember { mutableIntStateOf(GameStatsManager.getHighScore(ctx, "whack")) }
     var rewardMsg by remember { mutableStateOf<String?>(null) }
-    val hitScale by animateFloatAsState(
-        targetValue = if (hitAnim > 0) 1.3f else 1f,
-        animationSpec = tween(150),
-        label = "hitScale",
-    )
-
-    LaunchedEffect(lastHit) {
-        if (lastHit >= 0) {
-            hitAnim++
-            delay(150)
-        }
-    }
+    val moles = remember { mutableStateListOf<Int>() }
 
     LaunchedEffect(gameRunning) {
         if (!gameRunning) return@LaunchedEffect
-        while (timeLeft > 0) {
-            delay(1000)
-            timeLeft--
-            if (moles.size < 3 && Random.nextFloat() < 0.5f) {
-                val pos = Random.nextInt(gridSize * gridSize)
-                if (pos !in moles) moles.add(pos)
+        try {
+            while (timeLeft > 0) {
+                delay(1000)
+                timeLeft--
+                if (moles.size < 3 && Random.nextFloat() < 0.5f) {
+                    val pos = Random.nextInt(gridSize * gridSize)
+                    if (pos !in moles) moles.add(pos)
+                }
+                val gone = moles.filter { Random.nextFloat() < 0.3f }
+                if (gone.isNotEmpty()) moles.removeAll(gone)
             }
-            val iter = moles.iterator()
-            while (iter.hasNext()) {
-                if (Random.nextFloat() < 0.3f) iter.remove()
-            }
+        } catch (_: kotlinx.coroutines.CancellationException) {
+            return@LaunchedEffect
+        } catch (_: Exception) {
         }
         gameRunning = false
         gameOver = true
-        GameStatsManager.setHighScore(ctx, "whack", score)
-        highScore = maxOf(highScore, score)
-        val pts = (score / 2).coerceAtLeast(1)
-        PointsManager.addPoints(ctx, pts)
-        rewardMsg = strings.gameYouEarned.format(pts)
+        try {
+            GameStatsManager.setHighScore(ctx, "whack", score)
+            highScore = maxOf(highScore, score)
+            val pts = (score / 2).coerceAtLeast(1)
+            PointsManager.addPoints(ctx, pts)
+            rewardMsg = strings.gameYouEarned.format(pts)
+        } catch (_: Exception) {
+        }
     }
 
     fun startGame() {
@@ -111,9 +100,8 @@ fun WhackAMole(onBack: () -> Unit) {
         if (!gameRunning) return
         if (idx in moles) {
             haptic.performIfEnabled()
-            moles.remove(idx)
+            moles.removeAll { it == idx }
             score++
-            lastHit = idx
         } else {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
@@ -202,7 +190,14 @@ fun WhackAMole(onBack: () -> Unit) {
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     if (hasMole) {
-                                        Text("\uD83D\uDC3B", fontSize = 36.sp, modifier = Modifier.scale(hitScale))
+                                        Canvas(modifier = Modifier.size(60.dp)) {
+                                            drawCircle(Color(0xFFA1887F), radius = size.minDimension * 0.45f, center = Offset(size.width * 0.2f, size.height * 0.22f))
+                                            drawCircle(Color(0xFFA1887F), radius = size.minDimension * 0.45f, center = Offset(size.width * 0.8f, size.height * 0.22f))
+                                            drawCircle(Color(0xFF8D6E63), radius = size.minDimension * 0.42f, center = Offset(size.width * 0.5f, size.height * 0.5f))
+                                            drawCircle(Color(0xFF4E342E), radius = size.minDimension * 0.06f, center = Offset(size.width * 0.4f, size.height * 0.42f))
+                                            drawCircle(Color(0xFF4E342E), radius = size.minDimension * 0.06f, center = Offset(size.width * 0.6f, size.height * 0.42f))
+                                            drawCircle(Color(0xFF4E342E), radius = size.minDimension * 0.07f, center = Offset(size.width * 0.5f, size.height * 0.55f))
+                                        }
                                     }
                                 }
                             }

@@ -33,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nusv.lite.ui.components.GlassCard
+import com.nusv.lite.util.ZHStrings
+import com.nusv.lite.util.LocalAppStrings
 import com.nusv.lite.util.performIfEnabled
 import kotlinx.coroutines.delay
 import java.util.Calendar
@@ -41,30 +43,32 @@ import java.util.TimeZone
 private data class CityClock(
     val name: String,
     val country: String,
+    val countryEn: String,
     val timeZone: String,
     val offset: Int,
 )
 
 private val cities = listOf(
-    CityClock("Beijing", "中国", "Asia/Shanghai", 8),
-    CityClock("Tokyo", "日本", "Asia/Tokyo", 9),
-    CityClock("Seoul", "韩国", "Asia/Seoul", 9),
-    CityClock("Singapore", "新加坡", "Asia/Singapore", 8),
-    CityClock("London", "英国", "Europe/London", 0),
-    CityClock("Paris", "法国", "Europe/Paris", 1),
-    CityClock("Berlin", "德国", "Europe/Berlin", 1),
-    CityClock("New York", "美国", "America/New_York", -5),
-    CityClock("Los Angeles", "美国", "America/Los_Angeles", -8),
-    CityClock("Sydney", "澳大利亚", "Australia/Sydney", 11),
-    CityClock("Dubai", "阿联酋", "Asia/Dubai", 4),
-    CityClock("Moscow", "俄罗斯", "Europe/Moscow", 3),
-    CityClock("Mumbai", "印度", "Asia/Kolkata", 5),
-    CityClock("Auckland", "新西兰", "Pacific/Auckland", 13),
-    CityClock("Honolulu", "夏威夷", "Pacific/Honolulu", -10),
+    CityClock("Beijing", "中国", "China", "Asia/Shanghai", 8),
+    CityClock("Tokyo", "日本", "Japan", "Asia/Tokyo", 9),
+    CityClock("Seoul", "韩国", "South Korea", "Asia/Seoul", 9),
+    CityClock("Singapore", "新加坡", "Singapore", "Asia/Singapore", 8),
+    CityClock("London", "英国", "UK", "Europe/London", 0),
+    CityClock("Paris", "法国", "France", "Europe/Paris", 1),
+    CityClock("Berlin", "德国", "Germany", "Europe/Berlin", 1),
+    CityClock("New York", "美国", "USA", "America/New_York", -5),
+    CityClock("Los Angeles", "美国", "USA", "America/Los_Angeles", -8),
+    CityClock("Sydney", "澳大利亚", "Australia", "Australia/Sydney", 11),
+    CityClock("Dubai", "阿联酋", "UAE", "Asia/Dubai", 4),
+    CityClock("Moscow", "俄罗斯", "Russia", "Europe/Moscow", 3),
+    CityClock("Mumbai", "印度", "India", "Asia/Kolkata", 5),
+    CityClock("Auckland", "新西兰", "New Zealand", "Pacific/Auckland", 13),
+    CityClock("Honolulu", "夏威夷", "Hawaii", "Pacific/Honolulu", -10),
 )
 
 @Composable
 fun WorldClock(onBack: () -> Unit) {
+    val strings = LocalAppStrings.current
     val haptic = LocalHapticFeedback.current
     var tick by remember { mutableStateOf(0L) }
 
@@ -102,23 +106,24 @@ fun WorldClock(onBack: () -> Unit) {
                 Text("\u2190", style = MaterialTheme.typography.titleLarge)
             }
             Spacer(Modifier.width(12.dp))
-            Text("World Clock", style = MaterialTheme.typography.headlineMedium)
+            Text(strings.toolTitles["worldclock"] ?: "World Clock", style = MaterialTheme.typography.headlineMedium)
         }
 
         Spacer(Modifier.height(16.dp))
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items(cities) { city ->
-                CityCard(city)
+                CityCard(city, tick, strings)
             }
         }
     }
 }
 
 @Composable
-private fun CityCard(city: CityClock) {
+private fun CityCard(city: CityClock, tick: Long, strings: com.nusv.lite.util.AppStrings) {
     val tz = TimeZone.getTimeZone(city.timeZone)
     val now = Calendar.getInstance(tz)
+    now.timeInMillis = tick
     val hour = now.get(Calendar.HOUR_OF_DAY)
     val minute = now.get(Calendar.MINUTE)
     val second = now.get(Calendar.SECOND)
@@ -162,7 +167,7 @@ private fun CityCard(city: CityClock) {
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = offsetStr,
+                        text = if (strings === ZHStrings) city.country else city.countryEn,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -183,7 +188,7 @@ private fun CityCard(city: CityClock) {
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = if (isDay) "Day" else "Night",
+                text = if (isDay) strings.dayLabel else strings.nightLabel,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

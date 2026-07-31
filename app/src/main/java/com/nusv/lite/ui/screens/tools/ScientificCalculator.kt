@@ -671,7 +671,11 @@ private fun formatResult(d: Double): String {
     return if (d.isNaN() || d.isInfinite()) {
         "Error"
     } else if (d == floor(d) && !d.isInfinite()) {
-        d.toLong().toString()
+        if (d >= 1e15 || d <= -1e15) {
+            String.format("%.6e", d)
+        } else {
+            d.toLong().toString()
+        }
     } else {
         String.format("%.10f", d).trimEnd('0').trimEnd('.')
     }

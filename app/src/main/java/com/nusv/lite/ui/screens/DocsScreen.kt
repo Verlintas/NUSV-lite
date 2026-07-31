@@ -54,7 +54,7 @@ fun DocsScreen(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "开发笔记与文档",
+                text = strings.docsSubtitle,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 20.dp)
@@ -69,7 +69,7 @@ fun DocsScreen(
                     contentAlignment = Alignment.TopCenter
                 ) {
                     Text(
-                        text = "暂无文档",
+                        text = strings.docsEmpty,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

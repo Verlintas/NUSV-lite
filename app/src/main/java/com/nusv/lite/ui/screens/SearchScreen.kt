@@ -63,7 +63,7 @@ fun SearchScreen(
             IconButton(onClick = { haptic.performIfEnabled(); onBack() }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = strings.cdBack,
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -101,7 +101,7 @@ fun SearchScreen(
         if (results.isEmpty() && query.isNotEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    "No results for \"$query\"",
+                    strings.searchNoResults.format(query),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

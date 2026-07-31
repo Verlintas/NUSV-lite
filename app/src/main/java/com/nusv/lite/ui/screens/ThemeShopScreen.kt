@@ -128,7 +128,7 @@ fun ThemeShopScreen(
             if (theme.name == PointsManager.ORCA_THEME) return@forEach
             val isUnlocked = PointsManager.isUnlocked(ctx, theme.name)
             val isActive = selectedTheme == theme.name
-            val price = if (theme.name == "Default (Pink)") 0 else 10
+            val price = if (theme.name == "Default (Pink)") 0 else 50
 
             Box(
                 modifier = Modifier
@@ -235,7 +235,7 @@ private fun OrcaSection(
                 fontWeight = FontWeight.Bold, color = Color.White)
             Spacer(Modifier.height(4.dp))
             Text(
-                text = if (orcaActive) "\u2605 Premium Theme Active \u2605"
+                text = if (orcaActive) strings.premiumActive
                        else strings.orcaDesc,
                 style = MaterialTheme.typography.labelMedium,
                 color = Color.White.copy(alpha = 0.7f),

@@ -436,7 +436,7 @@ fun SettingsScreen(
             onDismissRequest = { showEasterEgg = false },
             title = {
                 Text(
-                    text = "Orca daisuki~",
+                    text = strings.settingsEasterEgg,
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
@@ -445,7 +445,7 @@ fun SettingsScreen(
             confirmButton = {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "OK",
+                        text = strings.okLabel,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clickable { haptic.performIfEnabled(); showEasterEgg = false }.padding(12.dp)

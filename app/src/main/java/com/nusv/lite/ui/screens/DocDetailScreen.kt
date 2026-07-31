@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nusv.lite.util.LocalAppStrings
 import com.nusv.lite.repository.AppRepository
 
 @Composable
@@ -32,11 +33,12 @@ fun DocDetailScreen(
     repository: AppRepository,
     onBack: () -> Unit
 ) {
+    val strings = LocalAppStrings.current
     val doc by repository.getDocById(docId).collectAsState(initial = null)
 
     if (doc == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Loading...")
+            Text(strings.detailLoading)
         }
         return
     }
@@ -49,7 +51,7 @@ fun DocDetailScreen(
         IconButton(onClick = onBack) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = strings.cdBack,
                 tint = MaterialTheme.colorScheme.primary
             )
         }

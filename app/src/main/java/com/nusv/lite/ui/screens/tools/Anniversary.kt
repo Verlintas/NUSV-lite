@@ -93,12 +93,8 @@ fun Anniversary(onBack: () -> Unit) {
     var pickedMillis by remember { mutableStateOf<Long?>(null) }
 
     fun daysBetween(millis: Long): Long {
-        val cal = java.util.Calendar.getInstance().apply {
+        val cal = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")).apply {
             timeInMillis = millis
-            set(java.util.Calendar.HOUR_OF_DAY, 0)
-            set(java.util.Calendar.MINUTE, 0)
-            set(java.util.Calendar.SECOND, 0)
-            set(java.util.Calendar.MILLISECOND, 0)
         }
         val date = LocalDate.of(cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH) + 1, cal.get(java.util.Calendar.DAY_OF_MONTH))
         return ChronoUnit.DAYS.between(date, LocalDate.now())
@@ -154,6 +150,7 @@ fun Anniversary(onBack: () -> Unit) {
                 items(events) { e ->
                     val diff = daysBetween(e.dateMillis)
                     val dateText = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                        .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
                         .format(java.util.Date(e.dateMillis))
                     Row(
                         modifier = Modifier

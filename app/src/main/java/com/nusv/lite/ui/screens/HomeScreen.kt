@@ -162,7 +162,7 @@ fun HomeScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Search,
-                        contentDescription = "Search",
+                        contentDescription = strings.cdSearch,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
@@ -204,7 +204,7 @@ fun HomeScreen(
             item {
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = "Recent Tools",
+                    text = strings.recentTools,
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
@@ -261,6 +261,7 @@ fun HomeScreen(
         items(allItems) { item ->
             ItemRow(
                 item = item,
+                strings = strings,
                 onClick = { onItemClick(item.id) }
             )
         }
@@ -339,6 +340,7 @@ fun FeaturedCard(
 @Composable
 fun ItemRow(
     item: Item,
+    strings: com.nusv.lite.util.AppStrings,
     onClick: () -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
@@ -372,7 +374,7 @@ fun ItemRow(
             )
         }
         Text(
-            text = formatTimeAgo(item.createdAt),
+            text = formatTimeAgo(item.createdAt, strings),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -385,14 +387,14 @@ fun ItemRow(
     }
 }
 
-private fun formatTimeAgo(epochMillis: Long): String {
+private fun formatTimeAgo(epochMillis: Long, strings: com.nusv.lite.util.AppStrings): String {
     val now = System.currentTimeMillis()
     val diff = now - epochMillis
     return when {
-        diff < 60_000 -> "just now"
-        diff < 3600_000 -> "${diff / 60_000}m ago"
-        diff < 86_400_000 -> "${diff / 3600_000}h ago"
-        diff < 604_800_000 -> "${diff / 86_400_000}d ago"
+        diff < 60_000 -> strings.timeJustNow
+        diff < 3600_000 -> strings.timeMinAgo.format(diff / 60_000)
+        diff < 86_400_000 -> strings.timeHourAgo.format(diff / 3600_000)
+        diff < 604_800_000 -> strings.timeDayAgo.format(diff / 86_400_000)
         else -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(epochMillis))
     }
 }

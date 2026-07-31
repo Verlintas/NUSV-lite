@@ -365,7 +365,7 @@ fun DiscoverScreen() {
                     textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                     decorationBox = { inner ->
                         if (searchQuery.isEmpty()) {
-                            Text("Search tools…", style = MaterialTheme.typography.bodyMedium,
+                            Text(strings.homeSearch, style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         inner()

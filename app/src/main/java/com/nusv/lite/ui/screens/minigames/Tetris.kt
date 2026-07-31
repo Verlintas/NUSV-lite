@@ -243,7 +243,7 @@ fun Tetris(onBack: () -> Unit) {
         }
 
         Text(
-            text = "${strings.gameScore.format(score)}    ${strings.gameHighScore} $highScore    Lv.${level()}",
+            text = "${strings.gameScore.format(score)}    ${strings.gameHighScore} $highScore    ${strings.lvLabel}${level()}",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

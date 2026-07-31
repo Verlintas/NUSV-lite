@@ -1,56 +1,123 @@
-package com.nusv.lite.ui.screens.minigames
+package com.nusv.lite.minigames
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.nusv.lite.util.GameStatsManager
-import com.nusv.lite.util.LocalAppStrings
-import com.nusv.lite.util.PointsManager
-import com.nusv.lite.util.SoundManager
-import com.nusv.lite.util.performIfEnabled
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import kotlin.math.max
+import org.junit.Test
+import kotlin.system.measureNanoTime
+
+class GomokuAiBench {
+
+    @Test
+    fun benchmark() {
+        println("warmup")
+        val w = MutableList(225) { 0 }
+        w[IndexOf(7, 7)] = 1
+        findBestMove(w, 2, 1)
+
+        val b1 = MutableList(225) { 0 }
+        b1[IndexOf(7, 7)] = 1
+        play("move2", b1)
+
+        val b2 = MutableList(225) { 0 }
+        val m2 = listOf(7 to 7, 7 to 8, 8 to 7, 6 to 8, 6 to 6, 7 to 5, 8 to 6, 5 to 7, 9 to 5, 5 to 6, 4 to 7, 6 to 9)
+        m2.forEachIndexed { i, (r, c) -> b2[IndexOf(r, c)] = if (i % 2 == 0) 1 else 2 }
+        play("midgame12", b2)
+
+        val b4 = MutableList(225) { 0 }
+        val m4 = listOf(
+            7 to 7, 7 to 8, 8 to 7, 6 to 8, 6 to 6, 7 to 5, 8 to 6, 5 to 7, 9 to 5, 5 to 6,
+            4 to 7, 6 to 9, 4 to 6, 6 to 10, 3 to 5, 7 to 11, 3 to 6, 8 to 10, 2 to 5, 9 to 12,
+            3 to 7, 8 to 11, 4 to 4, 5 to 9, 3 to 4, 6 to 11, 2 to 4, 7 to 12, 2 to 6, 8 to 9,
+            5 to 5, 9 to 6
+        )
+        m4.forEachIndexed { i, (r, c) -> b4[IndexOf(r, c)] = if (i % 2 == 0) 1 else 2 }
+        play("dense30", b4)
+
+        val random = kotlin.random.Random(42)
+        var b = MutableList(225) { 0 }
+        b[IndexOf(7, 7)] = 2
+        repeat(8) { turn ->
+            val idx = findBestMove(b, 1, 2)
+            val t = measureNanoTime { findBestMove(b, 1, 2) }
+            b[idx] = 1
+            println("simAI%-3d %5dms -> %d,%d".format(turn, t / 1_000_000, idx / 15, idx % 15))
+            if (checkWin(b, idx)) {
+                println("AI won in $turn")
+                return
+            }
+            val empty = (0 until 225).filter { b[it] == 0 }
+            b[empty.random(random)] = 2
+            if (turn > 5) {
+                println("player created open-three scenario, AI to respond")
+                play("urgent", b)
+                return
+            }
+        }
+    }
+
+    @Test
+    fun deltaConsistency() {
+        val random = kotlin.random.Random(7)
+        var board = MutableList(225) { 0 }
+        board[IndexOf(7, 7)] = 1
+        var total = evaluateBoard(board, 2, 1)
+        var i = 0
+        while (i < 20) {
+            val mover = if (i % 2 == 0) 2 else 1
+            val empty = (0 until 225).filter { board[it] == 0 }
+            val idx = empty.random(random)
+            board[idx] = mover
+            total += deltaEval(board, idx, mover, 2) + deltaEval(board, idx, if (mover == 1) 2 else 1, 2)
+            val full = evaluateBoard(board, 2, 1)
+            if (total != full) {
+                val sb = StringBuilder()
+                for (rr in 0 until 15) {
+                    for (cc in 0 until 15) sb.append(if (board[IndexOf(rr, cc)] == 0) '.' else board[IndexOf(rr, cc)].toString())
+                    sb.append('\n')
+                }
+                throw AssertionError("mismatch at move $i mover=$mover idx=$idx\nincremental=$total full=$full\n" + sb)
+            }
+            if (checkWin(board, idx)) break
+            i++
+        }
+        println("delta consistency OK")
+    }
+
+    @Test
+    fun ultimateVsBeginner() {
+        var w = 0
+        var l = 0
+        var d = 0
+        repeat(6) {
+            val b = MutableList(225) { 0 }
+            b[IndexOf(7, 7)] = 1
+            var turn = 1
+            while (true) {
+                val idx = if (turn % 2 == 0) findBestMove(b, 1, 2) else findEasyMove(b, 2, 1)
+                if (idx < 0) {
+                    d++
+                    break
+                }
+                b[idx] = if (turn % 2 == 0) 1 else 2
+                if (checkWin(b, idx)) {
+                    println("game $turn moves, winner=${if (turn % 2 == 0) "ultimate" else "beginner"}")
+                    if (turn % 2 == 0) w++ else l++
+                    break
+                }
+                turn++
+                if (turn > 220) {
+                    d++
+                    break
+                }
+            }
+        }
+        println("ultimate(1st) vs beginner: W$w L$l D$d")
+    }
+
+    private fun play(name: String, b: MutableList<Int>) {
+        val idx = findBestMove(b, 2, 1)
+        val t = measureNanoTime { findBestMove(b, 2, 1) }
+        println("%-10s %5dms -> %d,%d".format(name, t / 1_000_000, idx / 15, idx % 15))
+    }
+}
 
 private const val GOMOKU_SIZE = 15
 
@@ -480,235 +547,3 @@ private fun findEasyMove(board: List<Int>, me: Int, opponent: Int): Int {
     return bestIdx
 }
 
-@Composable
-fun Gomoku(onBack: () -> Unit) {
-    val haptic = LocalHapticFeedback.current
-    val strings = LocalAppStrings.current
-    val ctx = LocalContext.current
-
-    var state by remember { mutableStateOf(GomokuState()) }
-    var wins by remember { mutableIntStateOf(GameStatsManager.getHighScore(ctx, "gomoku")) }
-    var aiThinking by remember { mutableStateOf(false) }
-    var rewardMsg by remember { mutableStateOf<String?>(null) }
-    var gameId by remember { mutableIntStateOf(0) }
-    var difficulty by remember { mutableIntStateOf(1) }
-    var record by remember { mutableStateOf(GameStatsManager.getRecord(ctx, "gomoku")) }
-
-    val me = 1
-    val ai = 2
-
-    fun finish(winner: Int) {
-        state = state.copy(winner = winner)
-        if (winner == me) {
-            SoundManager.playWin()
-            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-            wins++
-            GameStatsManager.setHighScore(ctx, "gomoku", wins)
-            GameStatsManager.recordResult(ctx, "gomoku", "win")
-            val pts = if (difficulty == 0) 20 else 100
-            PointsManager.addPoints(ctx, pts)
-            rewardMsg = strings.gameYouEarned.format(pts)
-        } else if (winner == ai) {
-            SoundManager.playError()
-            GameStatsManager.recordResult(ctx, "gomoku", "loss")
-            if (difficulty == 1) {
-                val pts = 2
-                PointsManager.addPoints(ctx, pts)
-                rewardMsg = strings.gameYouEarned.format(pts)
-            }
-        } else {
-            SoundManager.playSuccess()
-            GameStatsManager.recordResult(ctx, "gomoku", "draw")
-        }
-        record = GameStatsManager.getRecord(ctx, "gomoku")
-    }
-
-    fun playMove(idx: Int): Boolean {
-        if (state.winner != 0 || state.board[idx] != 0) return false
-        val nb = state.board.toMutableList()
-        nb[idx] = state.turn
-        val won = checkWin(nb, idx)
-        val next = if (won) state.turn else 3 - state.turn
-        val newState = state.copy(board = nb, turn = next, lastMove = idx, winner = if (won) state.turn else 0)
-        state = newState
-        if (won) finish(state.turn)
-        return won
-    }
-
-    LaunchedEffect(state.turn, state.winner, gameId) {
-        if (state.winner == 0 && state.turn == ai && state.board.any { it != 0 }) {
-            aiThinking = true
-            delay(400)
-            val best = withContext(Dispatchers.Default) {
-                if (difficulty == 0) findEasyMove(state.board, ai, me) else findBestMove(state.board, ai, me)
-            }
-            if (best >= 0) {
-                val nb = state.board.toMutableList()
-                nb[best] = ai
-                val won = checkWin(nb, best)
-                state = state.copy(board = nb, turn = if (won) state.turn else me, lastMove = best, winner = if (won) ai else 0)
-                if (won) finish(ai)
-                SoundManager.playTap()
-            } else {
-                state = state.copy(winner = -1)
-                finish(-1)
-            }
-            aiThinking = false
-        }
-    }
-
-    fun restart() {
-        aiThinking = false
-        state = GomokuState()
-        rewardMsg = null
-        gameId++
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextButton(onClick = { onBack() }) { Text("‹") }
-            Text("Gomoku", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            TextButton(onClick = { haptic.performIfEnabled(); restart() }) { Text(strings.gameNewGame) }
-        }
-
-        val statusText = when {
-            state.winner == me -> "${strings.gameYouWin} (●)"
-            state.winner == ai -> strings.gameGameOver
-            state.winner == -1 -> strings.gameDraw
-            aiThinking -> strings.gameAiThinking
-            state.turn == me -> strings.gameYourTurn
-            else -> strings.gameAiThinking
-        }
-        Text(
-            text = statusText,
-            style = MaterialTheme.typography.labelLarge,
-            color = if (state.winner == me) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        rewardMsg?.let {
-            Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            listOf(0 to strings.gomokuLevelEasy, 1 to strings.gomokuLevelHard).forEach { (lv, label) ->
-                val selected = difficulty == lv
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(
-                            if (selected) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surfaceVariant
-                        )
-                        .clickable {
-                            haptic.performIfEnabled()
-                            if (difficulty != lv) {
-                                difficulty = lv
-                                restart()
-                            }
-                        }
-                        .padding(horizontal = 14.dp, vertical = 6.dp),
-                ) {
-                    Text(
-                        label,
-                        color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            }
-        }
-
-        Spacer(Modifier.height(6.dp))
-
-        Text(
-            text = "${strings.gomokuStats.format(record.wins, record.losses, record.draws)}    ${strings.gomokuWinRate.format(record.winRate)}",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        var boardSizePx by remember { mutableStateOf(0f) }
-        BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .aspectRatio(1f)
-                .background(Color(0xFFD7A85A), RoundedCornerShape(4.dp))
-                .onSizeChanged { boardSizePx = it.width.toFloat() }
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        val cellPx = boardSizePx / GOMOKU_SIZE
-                        if (cellPx <= 0f) return@detectTapGestures
-                        val r = (offset.y / cellPx).toInt().coerceIn(0, GOMOKU_SIZE - 1)
-                        val c = (offset.x / cellPx).toInt().coerceIn(0, GOMOKU_SIZE - 1)
-                        if (state.turn == me && state.winner == 0 && !aiThinking) {
-                            haptic.performIfEnabled()
-                            playMove(IndexOf(r, c))
-                        }
-                    }
-                }
-        ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                drawLines()
-                state.board.forEachIndexed { idx, v ->
-                    if (v != 0) {
-                        val cell = size.width / GOMOKU_SIZE
-                        val r = idx / GOMOKU_SIZE
-                        val c = idx % GOMOKU_SIZE
-                        val cx = c * cell + cell / 2
-                        val cy = r * cell + cell / 2
-                        val radius = cell * 0.38f
-                        if (v == 1) {
-                            drawCircle(Color.Black, radius, Offset(cx, cy))
-                            if (idx == state.lastMove) {
-                                drawCircle(Color.White, radius * 0.35f, Offset(cx, cy))
-                            }
-                        } else {
-                            drawCircle(Color.White, radius, Offset(cx, cy))
-                            if (idx == state.lastMove) {
-                                drawCircle(Color.Black, radius * 0.35f, Offset(cx, cy))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        if (state.winner != 0) {
-            Button(onClick = { haptic.performIfEnabled(); restart() }) { Text(strings.gamePlayAgain) }
-            Spacer(Modifier.height(8.dp))
-        }
-
-        Text(
-            text = strings.gameWinsCount.format(wins),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.height(16.dp))
-    }
-}
-
-private fun DrawScope.drawLines() {
-    val cell = size.width / GOMOKU_SIZE
-    val color = Color(0xFF5D3A1A)
-    for (i in 0 until GOMOKU_SIZE) {
-        val p = i * cell + cell / 2
-        drawLine(color, Offset(p, cell / 2), Offset(p, size.height - cell / 2), strokeWidth = 1.5f)
-        drawLine(color, Offset(cell / 2, p), Offset(size.width - cell / 2, p), strokeWidth = 1.5f)
-    }
-}

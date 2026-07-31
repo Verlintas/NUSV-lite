@@ -28,6 +28,7 @@ import com.nusv.lite.util.LanguagePrefs
 import com.nusv.lite.util.LayoutPrefs
 import com.nusv.lite.util.LocalAppStrings
 import com.nusv.lite.util.PointsManager
+import com.nusv.lite.util.SoundPrefs
 import com.nusv.lite.util.ZHStrings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
         ).fallbackToDestructiveMigration(true).build()
 
         HapticPrefs.init(applicationContext)
+        SoundPrefs.init(applicationContext)
         LanguagePrefs.init(applicationContext)
         LayoutPrefs.init(applicationContext)
         val loader = ContentLoader(applicationContext)

@@ -205,6 +205,12 @@ fun NusvNavHost(
                         onThemeChange = onThemeChange,
                         onLanguageChange = onLanguageChange,
                         onThemeShopClick = { navController.navigate("themes") },
+                        onAchievementsClick = { navController.navigate("achievements") },
+                    )
+                }
+                composable("achievements") {
+                    com.nusv.lite.ui.screens.AchievementsScreen(
+                        onBack = { navController.popBackStack() },
                     )
                 }
                 composable("themes") {

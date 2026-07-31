@@ -41,6 +41,9 @@ import com.nusv.lite.util.LanguagePrefs
 import com.nusv.lite.util.LayoutMode
 import com.nusv.lite.util.LayoutPrefs
 import com.nusv.lite.util.LocalAppStrings
+import com.nusv.lite.util.SoundManager
+import com.nusv.lite.util.SoundPrefs
+import com.nusv.lite.BuildConfig
 import com.nusv.lite.util.performIfEnabled
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -53,6 +56,7 @@ fun SettingsScreen(
     onThemeChange: ((Boolean?) -> Unit)? = null,
     onLanguageChange: ((Lang) -> Unit)? = null,
     onThemeShopClick: (() -> Unit)? = null,
+    onAchievementsClick: (() -> Unit)? = null,
 ) {
     var themeOption by remember { mutableStateOf("system") }
     val haptic = LocalHapticFeedback.current
@@ -129,6 +133,32 @@ fun SettingsScreen(
             }
         }
 
+        Spacer(Modifier.height(8.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable { haptic.performIfEnabled(); onAchievementsClick?.invoke() }
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column {
+                    Text(strings.achievementsTitle, style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary)
+                    Text(strings.achievementsDesc, style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text(">", style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+
         Spacer(Modifier.height(32.dp))
 
         Text(
@@ -183,6 +213,55 @@ fun SettingsScreen(
                         HapticPrefs.setEnabled(hapticEnabled)
                     },
                 contentAlignment = if (hapticEnabled) Alignment.CenterEnd else Alignment.CenterStart
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .padding(2.dp)
+                        .background(
+                            MaterialTheme.colorScheme.onPrimary,
+                            RoundedCornerShape(9.dp)
+                        )
+                )
+            }
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        Text(
+            text = strings.settingsSound,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
+        Spacer(Modifier.height(8.dp))
+
+        var soundEnabled by remember { mutableStateOf(SoundPrefs.isEnabled()) }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = strings.settingsSound,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(
+                        if (soundEnabled) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.surfaceVariant,
+                        RoundedCornerShape(22.dp)
+                    )
+                    .clickable {
+                        haptic.performIfEnabled()
+                        soundEnabled = !soundEnabled
+                        SoundPrefs.setEnabled(soundEnabled)
+                        if (soundEnabled) SoundManager.playSuccess()
+                    },
+                contentAlignment = if (soundEnabled) Alignment.CenterEnd else Alignment.CenterStart
             ) {
                 Box(
                     modifier = Modifier
@@ -325,7 +404,7 @@ fun SettingsScreen(
         ) {
             Text(text = strings.settingsVersion, style = MaterialTheme.typography.bodyLarge)
             Text(
-                text = "1.6.5",
+                text = BuildConfig.VERSION_NAME,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.clickable {

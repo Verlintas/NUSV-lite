@@ -68,6 +68,10 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.ViewModule
+import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material.icons.outlined.ContentCopy
@@ -102,6 +106,10 @@ import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.ViewModule
+import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material.icons.outlined.GridOn
+import androidx.compose.material.icons.outlined.Bedtime
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -133,6 +141,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.animation.AnimatedContent
@@ -154,6 +163,9 @@ import com.nusv.lite.ui.screens.minigames.SnakeGame
 import com.nusv.lite.ui.screens.minigames.WordleGame
 import com.nusv.lite.ui.screens.minigames.SimonGame
 import com.nusv.lite.ui.screens.minigames.WhackAMole
+import com.nusv.lite.ui.screens.minigames.Tetris
+import com.nusv.lite.ui.screens.minigames.Gomoku
+import com.nusv.lite.ui.screens.minigames.Sudoku
 import com.nusv.lite.ui.screens.tools.CurrencyConverter
 import com.nusv.lite.ui.screens.tools.WorldClock
 import com.nusv.lite.ui.screens.tools.IntervalTimer
@@ -168,6 +180,10 @@ import com.nusv.lite.ui.screens.tools.QRGenerator
 import com.nusv.lite.ui.screens.tools.KaomojiKeyboard
 import com.nusv.lite.ui.screens.tools.RandomQuotes
 import com.nusv.lite.ui.screens.tools.RandomNameGenerator
+import com.nusv.lite.ui.screens.tools.Anniversary
+import com.nusv.lite.ui.screens.tools.SleepCalc
+import com.nusv.lite.ui.screens.tools.LotteryGen
+import com.nusv.lite.util.AchievementManager
 import com.nusv.lite.util.ClickTracker
 import com.nusv.lite.util.LayoutMode
 import com.nusv.lite.util.LayoutPrefs
@@ -258,6 +274,14 @@ val miniApps = listOf(
     MiniApp("flashlight", "Flashlight", "Screen torch light", Icons.Outlined.FlashOn, Icons.Filled.FlashOn, Category.UTILITIES),
     MiniApp("battery", "Battery Info", "Battery level & status", Icons.Outlined.BatteryFull, Icons.Filled.BatteryFull, Category.UTILITIES),
     MiniApp("quicktimer", "Quick Timer", "1 / 3 / 5 / 10 min presets", Icons.Outlined.Timer, Icons.Filled.Timer, Category.UTILITIES),
+    // v1.10.0 games
+    MiniApp("tetris", "Tetris", "Classic falling blocks", Icons.Outlined.ViewModule, Icons.Filled.ViewModule, Category.GAMES),
+    MiniApp("gomoku", "Gomoku", "5-in-a-row vs AI", Icons.Outlined.Circle, Icons.Filled.Circle, Category.GAMES),
+    MiniApp("sudoku", "Sudoku", "Logic number puzzle", Icons.Outlined.GridOn, Icons.Filled.GridOn, Category.GAMES),
+    // v1.10.0 tools
+    MiniApp("anniversary", "Anniversary", "Countdown days to events", Icons.Outlined.DateRange, Icons.Filled.DateRange, Category.UTILITIES),
+    MiniApp("sleepcalc", "Sleep Calculator", "Best bedtime by sleep cycles", Icons.Outlined.Bedtime, Icons.Filled.Bedtime, Category.UTILITIES),
+    MiniApp("lottery", "Lottery Gen", "Generate lucky numbers", Icons.Outlined.Star, Icons.Filled.Star, Category.UTILITIES),
 )
 
 val orcaHiddenTools = listOf(
@@ -431,6 +455,7 @@ fun DiscoverScreen() {
                                 searchQuery = searchQuery,
                                 onClick = {
                                     ClickTracker.increment(context, app.id)
+                                    AchievementManager.recordUse(context, app.id, app.category == Category.GAMES)
                                     clickCounts.value = clickCounts.value.toMutableMap().apply { put(app.id, (this[app.id] ?: 0) + 1) }
                                     activeApp = app.id
                                 }
@@ -451,6 +476,7 @@ fun DiscoverScreen() {
                                 searchQuery = searchQuery,
                                 onClick = {
                                     ClickTracker.increment(context, app.id)
+                                    AchievementManager.recordUse(context, app.id, app.category == Category.GAMES)
                                     clickCounts.value = clickCounts.value.toMutableMap().apply { put(app.id, (this[app.id] ?: 0) + 1) }
                                     activeApp = app.id
                                 }
@@ -518,6 +544,12 @@ fun DiscoverScreen() {
                     "flashlight" -> Flashlight(onBack = { activeApp = null })
                     "battery" -> BatteryInfo(onBack = { activeApp = null })
                     "quicktimer" -> QuickTimer(onBack = { activeApp = null })
+                    "tetris" -> Tetris(onBack = { activeApp = null })
+                    "gomoku" -> Gomoku(onBack = { activeApp = null })
+                    "sudoku" -> Sudoku(onBack = { activeApp = null })
+                    "anniversary" -> Anniversary(onBack = { activeApp = null })
+                    "sleepcalc" -> SleepCalc(onBack = { activeApp = null })
+                    "lottery" -> LotteryGen(onBack = { activeApp = null })
                     "orcamatrix" -> MatrixRain(onBack = { activeApp = null })
                     "orcasecret" -> SecretVault(onBack = { activeApp = null })
                     "orca_clip" -> ClipboardHistory(onBack = { activeApp = null })
@@ -3641,38 +3673,63 @@ private fun QuickNotes(onBack: () -> Unit) {
 @Composable
 private fun MatrixRain(onBack: () -> Unit) {
     val haptic = LocalHapticFeedback.current
-    val chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789"
-    val columns = 20
-    var lines by remember { mutableStateOf(List(columns) { "" }) }
+    val chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF"
+    val columns = 24
+    val trailLen = 12
+    val maxHead = 32
+    var drops by remember { mutableStateOf(List(columns) { kotlin.random.Random.nextInt(0, maxHead) }) }
+    var tick by remember { mutableIntStateOf(0) }
     LaunchedEffect(Unit) {
+        var frame = 0
         while (true) {
-            delay(150)
-            lines = lines.mapIndexed { col, s ->
-                val newChar = chars[(0..chars.length-1).random()]
-                if (s.length > 20) newChar.toString()
-                else newChar + s
-            }
+            delay(60)
+            frame++
+            tick = frame
+            drops = drops.map { if (kotlin.random.Random.nextInt(100) < 12) 0 else (it + 1) % maxHead }
+        }
+    }
+    val paint = remember {
+        android.graphics.Paint().apply {
+            textAlign = android.graphics.Paint.Align.CENTER
         }
     }
     Box(
-        modifier = Modifier.fillMaxSize().background(Color.Black).clickable { haptic.performIfEnabled(); onBack() },
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize().background(Color.Black).clickable { haptic.performIfEnabled(); onBack() }
     ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val cellH = size.height / maxHead
+            val cellW = size.width / columns
+            paint.textSize = cellH * 0.9f
+            drops.forEachIndexed { col, head ->
+                for (i in 0 until trailLen) {
+                    val y = head - i
+                    if (y < 0) continue
+                    val alpha = if (i == 0) 1f else 1f - i.toFloat() / trailLen
+                    val c = chars[(tick + col * 7 + y * 3) % chars.length]
+                    paint.color = android.graphics.Color.argb(
+                        (255 * alpha).toInt(),
+                        if (i == 0) 220 else 0,
+                        255,
+                        if (i == 0) 220 else 0
+                    )
+                    drawContext.canvas.nativeCanvas.drawText(
+                        c.toString(),
+                        col * cellW + cellW / 2,
+                        y * cellH + cellH * 0.85f,
+                        paint
+                    )
+                }
+            }
+        }
         Column(Modifier.align(Alignment.TopStart).padding(12.dp)) {
             Text("\u2190 Back", color = Color.White.copy(alpha = 0.4f), style = MaterialTheme.typography.labelSmall)
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text("\uD83D\uDDA4", fontSize = 36.sp)
             Text("Matrix Rain", style = MaterialTheme.typography.headlineSmall, color = Color(0xFF00FF00), fontWeight = FontWeight.Bold)
-        }
-        lines.forEachIndexed { col, line ->
-            Box(Modifier.align(Alignment.TopStart).padding(start = (8 + col * 18).dp, top = 60.dp)) {
-                Text(
-                    text = line.take(1),
-                    color = Color(0xFF00FF00).copy(alpha = 0.7f),
-                    style = MaterialTheme.typography.labelMedium,
-                )
-            }
         }
     }
 }

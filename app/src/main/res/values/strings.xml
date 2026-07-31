@@ -19,4 +19,11 @@
     <string name="cat_utilities">实用工具</string>
     <string name="cat_devtools">开发工具</string>
     <string name="cat_other">其他</string>
+    <string name="widget_name">NUSV</string>
+    <string name="widget_points_default">积分: 0</string>
+    <string name="widget_points_value">积分: %1$d</string>
+    <string name="widget_streak_default">连续签到: 0 天</string>
+    <string name="widget_streak_value">连续签到: %1$d 天</string>
+    <string name="widget_checkin">签到</string>
+    <string name="widget_checkin_done">已签到</string>
 </resources>

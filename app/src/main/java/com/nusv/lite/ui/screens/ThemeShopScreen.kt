@@ -56,6 +56,11 @@ fun ThemeShopScreen(
     var checkInMsg by remember { mutableStateOf<String?>(null) }
     var selectedTheme by remember { mutableStateOf(PointsManager.getSelectedTheme(ctx)) }
     val unlocked = remember { mutableStateOf(PointsManager.getUnlocked(ctx)) }
+    val applyTheme: (String) -> Unit = { name ->
+        PointsManager.setSelectedTheme(ctx, name)
+        selectedTheme = name
+        onThemeSelected(name)
+    }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
@@ -137,9 +142,7 @@ fun ThemeShopScreen(
                     .clickable {
                         if (isUnlocked) {
                             haptic.performIfEnabled()
-                            PointsManager.setSelectedTheme(ctx, theme.name)
-                            selectedTheme = theme.name
-                            onThemeSelected(theme.name)
+                            applyTheme(theme.name)
                         }
                     }
                     .padding(12.dp),
@@ -183,9 +186,7 @@ fun ThemeShopScreen(
                                 if (PointsManager.purchaseTheme(ctx, theme.name)) {
                                     unlocked.value = PointsManager.getUnlocked(ctx)
                                     balance = PointsManager.getBalance(ctx)
-                                    PointsManager.setSelectedTheme(ctx, theme.name)
-                                    selectedTheme = theme.name
-                                    onThemeSelected(theme.name)
+                                    applyTheme(theme.name)
                                 }
                             },
                             enabled = balance >= price,
@@ -200,7 +201,7 @@ fun ThemeShopScreen(
         }
 
         Spacer(Modifier.height(24.dp))
-        OrcaSection(ctx, strings, balance, selectedTheme, haptic, onThemeSelected)
+        OrcaSection(ctx, strings, balance, selectedTheme, haptic, applyTheme)
 
         Spacer(Modifier.height(40.dp))
     }
@@ -213,22 +214,19 @@ private fun OrcaSection(
     balance: Int,
     selectedTheme: String,
     haptic: androidx.compose.ui.hapticfeedback.HapticFeedback,
-    onThemeSelected: (String) -> Unit,
+    applyTheme: (String) -> Unit,
 ) {
     val orcaPurchased = PointsManager.isOrcaPurchased(ctx)
     val orcaActive = selectedTheme == PointsManager.ORCA_THEME
     val eligible = PointsManager.isOrcaEligible(ctx)
     val streak = PointsManager.getStreak(ctx)
 
-    var localPurchased by remember { mutableStateOf(orcaPurchased) }
-    var localActive by remember { mutableStateOf(orcaActive) }
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(if (localActive) Color.White.copy(alpha = 0.12f) else Color.Black)
-            .border(1.dp, Color.White.copy(alpha = if (localActive) 0.9f else 0.4f), RoundedCornerShape(16.dp))
+            .background(if (orcaActive) Color.White.copy(alpha = 0.12f) else Color.Black)
+            .border(1.dp, Color.White.copy(alpha = if (orcaActive) 0.9f else 0.4f), RoundedCornerShape(16.dp))
             .padding(16.dp),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
@@ -237,7 +235,7 @@ private fun OrcaSection(
                 fontWeight = FontWeight.Bold, color = Color.White)
             Spacer(Modifier.height(4.dp))
             Text(
-                text = if (localActive) "\u2605 Premium Theme Active \u2605"
+                text = if (orcaActive) "\u2605 Premium Theme Active \u2605"
                        else strings.orcaDesc,
                 style = MaterialTheme.typography.labelMedium,
                 color = Color.White.copy(alpha = 0.7f),
@@ -270,7 +268,7 @@ private fun OrcaSection(
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White.copy(alpha = 0.6f))
                 }
-                !localPurchased -> {
+                !orcaPurchased -> {
                     Text(strings.orcaCost, style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold, color = Color.White)
                     Spacer(Modifier.height(8.dp))
@@ -278,10 +276,7 @@ private fun OrcaSection(
                         onClick = {
                             haptic.performIfEnabled()
                             if (PointsManager.purchaseOrcaTheme(ctx)) {
-                                localPurchased = true
-                                PointsManager.setSelectedTheme(ctx, PointsManager.ORCA_THEME)
-                                localActive = true
-                                onThemeSelected(PointsManager.ORCA_THEME)
+                                applyTheme(PointsManager.ORCA_THEME)
                             }
                         },
                         enabled = balance >= 10000,
@@ -297,13 +292,11 @@ private fun OrcaSection(
                             color = Color.White.copy(alpha = 0.5f))
                     }
                 }
-                !localActive -> {
+                !orcaActive -> {
                     Button(
                         onClick = {
                             haptic.performIfEnabled()
-                            PointsManager.setSelectedTheme(ctx, PointsManager.ORCA_THEME)
-                            localActive = true
-                            onThemeSelected(PointsManager.ORCA_THEME)
+                            applyTheme(PointsManager.ORCA_THEME)
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.White,
@@ -318,9 +311,7 @@ private fun OrcaSection(
                     Button(
                         onClick = {
                             haptic.performIfEnabled()
-                            PointsManager.setSelectedTheme(ctx, PointsManager.FREE_THEME)
-                            localActive = false
-                            onThemeSelected(PointsManager.FREE_THEME)
+                            applyTheme(PointsManager.FREE_THEME)
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.White.copy(alpha = 0.2f),

@@ -1,165 +1,161 @@
-# 更新日志
+# Changelog
 
-> 应用内「文档」页同步维护，历史版本记录
+> Mirrored in the in-app "Docs" page.
 
 ## v1.10.0 (2026-07-31)
 
-- **新游戏 ×3**：
-  - 俄罗斯方块（Tetris）：10×20 棋盘、7 种经典方块、旋转/软降/硬降、加速等级、消除计分与最高分
-  - 五子棋（Gomoku）：15×15 棋盘对战 AI，AI 具备威胁感知攻防（活三必堵、活四必杀），胜利 +100 积分
-  - 数独（Sudoku）：自动生成题目，简单/中等/困难三档难度，检查与擦除功能，通关 +40 积分
-- **新工具 ×3**：
-  - 倒数日（Anniversary）：记录重要日期，自动计算已过/还有多少天
-  - 睡眠计算器（Sleep Calculator）：按 90 分钟睡眠周期推荐最佳入睡/起床时间
-  - 大乐透生成器（Lottery Gen）：前区 5 个 01-35 + 后区 2 个 01-12，1-5 注机选
-- **桌面小组件**：NUSV 小组件显示积分与连续签到天数，支持桌面一键签到
-- **成就系统**：10 枚成就徽章（游戏/工具/签到/积分/Orca），设置页可查看解锁进度
-- **游戏音效**：全新音效系统（操作/成功/错误/胜利音），设置页可一键开关
-- **五子棋难度**：初级模式（赢 +20）/ 完全体模式（赢 +100，输 +2）
-- **主题商店扩充**：新增 12 款配色主题，普通主题 50 积分解锁
-- **矩阵雨重写**：Canvas 拖尾雨滴效果（亮头 + 渐隐尾巴 + 随机重置）
-- **主题状态修复**：切换主题不再出现多个「使用中」叠加
-- **设置页版本号动态化**：About 版本号自动跟随构建版本
-- **打地鼠稳定性重写**：去除动画与 emoji 依赖，全面异常防护
-- **睡眠计算器修复**：修复计算崩溃（格式串参数缺失）
-- **发布前全量审计修复**：
-  - 五子棋 AI 再强化：8 层搜索 + 威胁延伸，与初级 AI 对弈 6:0
-  - 五子棋：重开后 AI 卡死修复
-  - Wordle：物理键盘按键失效修复
-  - 打地鼠：中途离开游戏不再结算奖励
-  - 贪吃蛇：方向键连按偶发反向 bug 修复
-  - 数独：生成题目与难度切换状态修复、结算最高分格式修复
-  - 世界时钟：整屏冻结修复，城市显示中英文国家名
-  - 生物节律：日期偏差修复（不再缓存旧数据）
-  - 倒数日：跨时区天数计算偏差修复
-  - 科学计算器：大数溢出改科学计数法显示
-  - 摩斯电码：空格双向映射修复、节拍器计时修复、颜文字乱码修复
-- **界面文本全面接入中英文切换**：主页/浏览/搜索/详情/文档/设置/主题商店/世界时钟/Tetris 等硬编码文本全部国际化
-- 版本号更新至 1.10.0（工具总数 73）
+- **New games ×3**:
+  - Tetris: 10×20 board, 7 classic tetrominoes, rotate / soft drop / hard drop, speed levels, line-clear scoring with high score
+  - Gomoku: 15×15 board vs AI; threat-aware AI (always blocks open threes, kills open fours), 8-ply search + threat extension, Beginner / Ultimate difficulties, +100 points on win
+  - Sudoku: auto-generated puzzles, Easy / Medium / Hard, check & erase, +40 points on completion
+- **New tools ×3**: Anniversary (countdown to important dates), Sleep Calculator (90-minute cycle recommendations), Lottery Gen (5+2 lucky picks)
+- **Home-screen widget**: shows points & check-in streak, one-tap check-in from the desktop
+- **Achievements**: 10 achievement badges (games / tools / check-ins / points / Orca), progress viewable in Settings
+- **Game sound effects**: new sound system (action / success / error / victory), toggle in Settings
+- **Gomoku difficulties**: Beginner (win +20) / Ultimate (win +100, lose +2)
+- **Theme shop expansion**: 12 new color themes, 50 points each
+- **Matrix rain rewrite**: Canvas-based trailing rain (bright head + fading tail + random reset)
+- **Theme state fix**: switching themes no longer leaves multiple "In use" states
+- **Whack-a-Mole stability rewrite**: no animations/emoji dependencies, full exception protection
+- **Sleep Calculator fix**: fixed crash (missing format string arguments)
+- **Pre-release full audit fixes**:
+  - Gomoku AI strengthened: 8-ply search + threat extension, 6:0 vs Beginner AI
+  - Gomoku: AI stuck after restart fixed
+  - Wordle: physical keyboard input fixed
+  - Whack-a-Mole: leaving the game mid-round no longer grants rewards
+  - Snake: rapid direction changes no longer reverse the snake
+  - Sudoku: puzzle generation / difficulty switching state fixed; high-score formatting fixed
+  - World Clock: whole-screen freeze fixed; city cards now show country names in both languages
+  - Biorhythm: date offset fixed (no longer serves stale cached data)
+  - Anniversary: cross-timezone day-count offset fixed
+  - Scientific Calculator: large numbers now shown in scientific notation
+  - Morse Code: space mapping fixed both ways; Interval Timer timing fixed; Kaomoji corrupted characters fixed
+- **Full i18n pass**: all hardcoded UI strings (Home / Browse / Search / Detail / Docs / Settings / Theme Shop / World Clock / Tetris) now switch between Chinese and English
+- Version bumped to 1.10.0 (73 tools total)
 
 ## v1.9.0 (2026-07-30)
 
-- **Orca 高级主题**：全新纯黑/纯白高级主题系统
-  - 连续签到 7 天解锁购买资格（需 10,000 积分）
-  - 激活后强制暗黑模式，纯黑背景 + 纯白主题色
-  - 卡片切换为纯黑背景 + 白色边框
-  - 全部游戏和签到积分翻倍（×2 倍率）
-  - 主页标题显示「NUSV Orca」
-  - 解锁 11 个专属隐藏工具：Matrix Rain（矩阵雨动画）、Secret Vault（密码保险柜）、Clipboard History（剪贴板历史）、Habit Tracker（习惯打卡）、Text Encrypt（文本加密）、Speed Reader（速读训练）、Color Picker（颜色选择器）、Password Checker（密码检测）、Text Diff（文本对比）、CSS Gradient（CSS 渐变）、Quick Notes（快速便签）
-- **新手电筒工具**：点击切换纯白/背景色，模拟闪光灯
-- **电池信息工具**：显示电量百分比、充电状态、温度、电压
-- **快速计时器工具**：1/3/5/10 分钟预设，开始/暂停/重置
-- **中英文翻译补全**：新增全部工具的中英文标题与描述
-- 深度代码重构与稳定性改进
-- 版本号更新至 1.9.0（工具总数 67）
+- **Orca premium theme**: all-new pure black/white premium theme system
+  - Unlock eligibility with a 7-day check-in streak (10,000 points required)
+  - Forces dark mode when active, pure black background + pure white accents
+  - Cards switch to black with white borders
+  - Double points (×2) from all games and check-ins
+  - Home title shows "NUSV Orca"
+  - Unlocks 11 exclusive hidden tools: Matrix Rain, Secret Vault, Clipboard History, Habit Tracker, Text Encrypt, Speed Reader, Color Picker, Password Checker, Text Diff, CSS Gradient, Quick Notes
+- **Flashlight tool**: toggle pure white / background color, simulates a flashlight
+- **Battery info tool**: charge level, charging state, temperature, voltage
+- **Quick Timer tool**: 1/3/5/10-minute presets, start/pause/reset
+- **Full zh/en translation pass**: Chinese & English titles/descriptions for every tool
+- Deep code refactor and stability improvements
+- Version bumped to 1.9.0 (67 tools total)
 
 ## v1.8.0 (2026-07-30)
 
-- **游戏赚积分**：所有 8 款游戏在获胜/结束时根据表现奖励积分
-  - 井字棋：赢 +3 分 / 平 +1 分
-  - 2048：总分 / 100（至少 1 分）
-  - 扫雷：获胜 +5 分
-  - 记忆配对：完成 +5 分
-  - 贪吃蛇：每颗食物 +1 分
-  - Wordle：猜对 +5 分
-  - Simon Says：每轮 +1 分
-  - 打地鼠：每 2 只地鼠 +1 分
-- **游戏最高分**：新增 GameStatsManager，每款游戏记录历史最佳成绩，游戏内实时显示 Best
-- **连续签到**：签到连续天数追踪，连续 7 天额外 +5 积分奖励
-- **主题商店**：新增连续签到天数显示（🔥 火焰图标 + 连签奖励提示）
-- **游戏动画修复**：骰子滚动、硬币翻转、八号球摇晃动画现在正确播放（context + delay 异步切换状态）
-- **摩斯电码修复**：移除与 @ 冲突的无标准编码 # 字符映射
-- **Wordle 词库扩充**：从 56 个词扩充至 540+ 个常用 5 字母单词
-- **Wordle 键盘位置**：增加底部 96dp 内边距，避免被导航栏遮挡
-- **记忆配对偶发卡死修复**：翻两张不匹配时卡住无法操作的 bug
-- 版本号更新至 1.8.0（工具总数 47）
+- **Earn points from games**: all 8 games award points for winning/finishing
+  - Tic-Tac-Toe: +3 win / +1 draw
+  - 2048: total score / 100 (min 1)
+  - Minesweeper: +5 on win
+  - Memory Match: +5 on completion
+  - Snake: +1 per food
+  - Wordle: +5 on correct guess
+  - Simon Says: +1 per round
+  - Whack-a-Mole: +1 per 2 moles
+- **Game high scores**: new GameStatsManager, best scores tracked per game, shown in-game as Best
+- **Check-in streak**: consecutive-day tracking, +5 bonus after 7 consecutive days
+- **Theme shop**: shows check-in streak (🔥 flame icon + streak reward hint)
+- **Game animation fixes**: dice roll, coin flip, magic 8-ball shake now animate correctly
+- **Morse Code fix**: removed non-standard `#` mapping conflicting with `@`
+- **Wordle dictionary expansion**: 56 → 540+ common 5-letter words
+- **Wordle keyboard position**: added 96dp bottom padding to avoid navigation bar overlap
+- **Memory Match freeze fix**: game no longer gets stuck after two mismatched flips
+- Version bumped to 1.8.0 (47 tools total)
 
 ## v1.7.1 (2026-07-30)
 
-- 修复上述 1.7.0 中多项 bug
-- Wordle 词库从 56 个扩充至 540+ 个常用词
-- Wordle 键盘加入底部内边距，避免被导航栏遮挡
-- 修复记忆配对翻两张不匹配时卡死的 bug
-- 版本号更新至 1.7.1
+- Fixed multiple bugs introduced in 1.7.0
+- Wordle dictionary expanded from 56 to 540+ common words
+- Wordle keyboard bottom padding to avoid navigation bar overlap
+- Fixed Memory Match freeze after two mismatched flips
+- Version bumped to 1.7.1
 
 ## v1.7.0 (2026-07-30)
 
-- 新增 4 款游戏：贪吃蛇（Canvas 蛇身渐变 + 食物脉冲）、Wordle（虚拟键盘 + 字母状态颜色）、Simon Says（4 色发光按钮）、打地鼠（30 秒限时挑战）
-- 游戏特效增强：TicTacToe 放置弹簧动画 + 胜利脉冲、MemoryMatch 卡片弹入 + 配对高亮、贪吃蛇食物粒子旋转
-- 所有游戏全面接入语言切换系统（中/英文）
-- 补全 6 处游戏内震动反馈
-- 分享结果：随机语录、二维码内容、名字生成器、科学计算器
-- Discover 布局切换（列表 / 两列网格 / 三列网格）
-- Discover 搜索关键词高亮（匹配文字变为主题色 + 加粗）
-- 更多主题 / 主题商店全部文本接入语言切换
-- 最近使用工具上限改为 5 个，按时间左近右远排列
-- 深色模式下主页卡片颜色修复
-- 版本号更新至 1.7.0（工具总数 47）
+- 4 new games: Snake (Canvas body gradient + pulsing food), Wordle (virtual keyboard + letter state colors), Simon Says (4 glowing buttons), Whack-a-Mole (30-second challenge)
+- Game effects: TicTacToe spring placement + win pulse, Memory Match card pop-in + match highlight, Snake food particle rotation
+- All games fully integrated with the language switching system (zh/en)
+- Added 6 missing haptic feedback triggers
+- Result sharing: random quotes, QR content, name generator, scientific calculator
+- Discover layout switching (list / 2-col / 3-col grid)
+- Discover search keyword highlighting (matched text becomes theme-colored + bold)
+- More themes / theme shop fully localized
+- Recent tools capped at 5, sorted by recency left-to-right
+- Dark mode home card color fixes
+- Version bumped to 1.7.0 (47 tools total)
 
 ## v1.6.5 (2026-07-30)
 
-- Discover 页改为列表布局（取代田字格）
-- 最近使用工具上限改为 5 个，按时间左近右远排列
-- 更多主题 / 主题商店全部文本接入语言切换
-- 补全 5 处缺失的震动反馈
-- 深色模式下主页卡片颜色修复
-- 版本号更新至 1.6.5
-- 设置新增布局切换（列表 / 两列网格 / 三列网格）
-- Discover 搜索关键词高亮（匹配文字变为主题色 + 加粗）
-- 分享结果：随机语录、二维码内容、名字生成器、科学计算器
-- 新增 4 款游戏：贪吃蛇（Canvas 蛇身渐变 + 食物脉冲）、Wordle（虚拟键盘 + 字母状态颜色）、Simon Says（4 色发光按钮）、打地鼠（30 秒限时挑战）
-- 游戏特效增强：TicTacToe 放置弹簧动画 + 胜利脉冲、MemoryMatch 卡片弹入 + 配对高亮、贪吃蛇食物粒子旋转
+- Discover switched to list layout (replacing the grid)
+- Recent tools capped at 5, newest on the left
+- More themes / theme shop fully localized
+- 5 missing haptic feedback triggers added
+- Dark mode home card color fixes
+- Version bumped to 1.6.5
+- Settings layout switching (list / 2-col / 3-col grid)
+- Discover search keyword highlighting
+- Result sharing: random quotes, QR content, name generator, scientific calculator
+- 4 new games: Snake, Wordle, Simon Says, Whack-a-Mole
+- Game effects: TicTacToe spring animation + win pulse, Memory Match card pop-in, Snake food particles
 
 ## v1.6.0 (2026-07-30)
 
-- 每日签到系统（随机 1-3 积分，每天一次）
-- 主题商店（10 款配色主题，10 积分解锁一款）
-- 设置页新增「更多主题」入口
-- Discover 搜索框（按名称/描述实时过滤）
-- 首页最近使用工具行
-- App Shortcuts（长按桌面图标直达 QR / 画板 / 骰子 / 计算器）
-- 浅色模式主页精选卡片改为紫色纯色
+- Daily check-in system (1-3 random points, once per day)
+- Theme shop (10 color themes, 10 points each)
+- Settings "More Themes" entry
+- Discover search box (real-time name/description filtering)
+- Home recent tools row
+- App Shortcuts (long-press launcher icon: QR / Drawing Pad / Dice / Calculator)
+- Light mode featured cards switched to purple
 
 ## v1.5.0 (2026-07-30)
 
-- 新增 6 个高级工具：
-  - 科学计算器（三角函数 / 对数 / 括号 / 历史记录）
-  - 画板（自由涂鸦 / 颜色 / 笔刷 / 撤销 / 保存）
-  - Markdown 实时预览（编辑 / 预览 / 分屏）
-  - 生物节律（物理 / 情绪 / 智力 曲线图表）
-  - 节拍器（BPM / 拍号 / Tap Tempo / 震动）
-  - 摩斯电码（文字↔摩斯 / 震动播放 / 复制）
-- 新增 4 个生成式工具：
-  - 二维码生成器（ZXing 编码 / 保存到相册）
-  - 颜文字键盘（8 分类 300+ 表情 / 搜索 / 一键复制）
-  - 随机语录（60 条名言 / 分类筛选 / 复制）
-  - 名字生成器（奇幻 / 日式 / 英文 / 科幻 / 中文）
-- 画板大幅增强：喷雾 / 标记 / 彩虹 / 书法笔、橡皮擦、透明度滑条、方头笔刷、色相拾色器
-- Discover 推荐排序：根据使用频率自动排列
-- 工具总数从 33 增至 43
-- Bug 修复与性能优化
+- 6 new advanced tools:
+  - Scientific Calculator (trig / log / parentheses / history)
+  - Drawing Pad (freehand / colors / brushes / undo / save)
+  - Markdown live preview (edit / preview / split)
+  - Biorhythm (physical / emotional / intellectual curves)
+  - Metronome (BPM / time signature / tap tempo / vibration)
+  - Morse Code (text ↔ morse / vibration playback / copy)
+- 4 new generative tools:
+  - QR Code Generator (ZXing encoding / save to gallery)
+  - Kaomoji Keyboard (8 categories, 300+ faces / search / one-tap copy)
+  - Random Quotes (60 quotes / category filter / copy)
+  - Name Generator (fantasy / Japanese / English / sci-fi / Chinese)
+- Drawing Pad heavily enhanced: spray / marker / rainbow / calligraphy brushes, eraser, opacity slider, square brush, hue picker
+- Discover recommendation ordering by usage frequency
+- Tool count from 33 → 43
+- Bug fixes and performance improvements
 
 ## v1.4.0 (2026-07-30)
 
-- 语言切换系统（中文 / English）
-- Discover 分类筛选（全部 / 游戏 / 实用工具 / 开发工具 / 其他）
-- Mini-app 工具动画（骰子弹跳、硬币旋转、密码淡入、秒表脉冲）
-- Bug 修复：Settings 滚动、语言切换不生效
+- Language switching system (中文 / English)
+- Discover category filter (All / Games / Utilities / Dev Tools / Other)
+- Mini-app tool animations (dice bounce, coin spin, password fade, stopwatch pulse)
+- Bug fixes: Settings scrolling, language switch not taking effect
 
 ## v1.3.0 (2026-07-29)
 
-- 设置页：主题切换、触觉反馈开关、同步按钮
-- 33 个 Mini-app 工具
-- 页面转场动画 + scalePress 反馈
-- 启动屏 Splash Screen
+- Settings page: theme switching, haptic feedback toggle, sync button
+- 33 Mini-app tools
+- Page transition animations + scalePress feedback
+- Splash screen
 
 ## v1.2.0 (2026-07-29)
 
-- 发现页（Discover）Mini-app 网格布局
-- 远程同步框架（SyncManager）
-- HapticPrefs 触觉反馈系统
+- Discover page (Mini-app grid layout)
+- Remote sync framework (SyncManager)
+- HapticPrefs haptic feedback system
 
 ## v1.1.0 (2026-07-29)
 
-- Docs 页面 + Markdown 渲染
-- 页面间标签栏导航
+- Docs page + Markdown rendering
+- Tab navigation between pages

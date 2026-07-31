@@ -1,40 +1,40 @@
 # NUSV LITE
 
-NUSV 的官方安卓客户端，将 NUSV 生态装进口袋。
+Official Android client for NUSV, putting the entire NUSV ecosystem in your pocket.
 
-## 功能
+## Features
 
-- 浏览 NUSV 各站点的最新内容，分类整理，快速直达
-- 内置丰富的小工具和游戏：经典游戏、计算与换算、开发工具、生成式创意工具等应有尽有
-- 每日签到 & 积分系统，积分可解锁主题商店配色
-- **Orca 高级主题**：通过长期签到解锁的专属高级主题
-  - 纯黑背景 + 纯白界面，卡片透明 + 白边框
-  - 所有游戏和签到积分翻倍（×2）
-  - 解锁仅 Orca 用户可见的专属隐藏工具
-- 中文 / English 语言切换
-- 深色 / 浅色主题
-- 布局切换（列表 / 两列网格 / 三列网格）
-- 搜索结果高亮、触觉反馈、远程同步
-- 游戏赚积分 & 历史最高分记录
+- Browse the latest content across NUSV sites, organized by category for quick access
+- Built-in tools & games: classic games, calculators & converters, dev tools, generative creative tools and more
+- Daily check-in & points system; points unlock color themes in the theme shop
+- **Orca premium theme**: exclusive theme unlocked through long-term check-ins
+  - Pure black background + pure white UI, transparent cards with white borders
+  - Double points (×2) from all games and check-ins
+  - Unlock exclusive hidden tools visible only to Orca users
+- 中文 / English language switching
+- Dark / light themes
+- Layout switching (list / two-column grid / three-column grid)
+- Search result highlighting, haptic feedback, remote sync
+- Earn points from games & per-game high-score tracking
 
-## 技术栈
+## Tech Stack
 
 - Kotlin + Jetpack Compose
-- Material 3 设计语言
-- Room 本地数据库
-- 灵感来自 Arc / Linear / Vercel
+- Material 3 design language
+- Room local database
+- Inspired by Arc / Linear / Vercel
 
-## 构建
+## Build
 
 ```bash
-# 需要 JDK 17
+# Requires JDK 17
 ./gradlew assembleDebug
-# 产物: app/build/outputs/apk/debug/app-debug.apk
+# Output: app/build/outputs/apk/debug/app-debug.apk
 ```
 
-发布版 APK 位于 `release/` 目录。
+Release APKs live in the `release/` directory.
 
-## 文档
+## Documentation
 
-- [更新日志](CHANGELOG.md)（v1.1.0 至今完整版本记录）
-- 应用内「文档」页同步维护
+- [CHANGELOG](CHANGELOG.md) (complete version history from v1.1.0)
+- Mirrored in the in-app "Docs" page

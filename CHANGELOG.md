@@ -145,7 +145,10 @@
 ## v1.3.0 (2026-07-29)
 
 - Settings page: theme switching, haptic feedback toggle, sync button
-- 33 Mini-app tools
+- 33 mini-app tools:
+  - Mini games: Dice, Coin Flip, Magic 8-Ball, Rock-Paper-Scissors, Slot Machine
+  - Everyday: Tip Calculator, BMI Calculator, Random Number, Unit Converter, Stopwatch, Countdown Timer, Text Statistics, Age Calculator, Password Generator, Percentage, Base Converter, Bill Splitter, Date Difference
+  - Productivity: Pomodoro, Decision Maker, Palindrome Checker, Todo List, JSON Formatter, Base64 Tool, Color Converter, UUID Generator, Hash Generator, Epoch Converter, URL Tool, Case Converter, Regex Tester, Lorem Ipsum, Breathing Exercise
 - Page transition animations + scalePress feedback
 - Splash screen
 

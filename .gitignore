@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+build/
+app/build/
+
+# Android
+local.properties
+*.apk.idsig
+*.apk.aab
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+*.iml
+
+# Backup / temp
+*.bak
+*.tmp
+
+# Local deploy sync
+deploy/

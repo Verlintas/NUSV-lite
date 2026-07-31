@@ -20,7 +20,7 @@ object PointsManager {
 
     private fun prefs(c: Context) = c.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun getBalance(c: Context): Int = 10000
+    fun getBalance(c: Context): Int = prefs(c).getInt(KEY_BALANCE, 0)
 
     fun getPointsMultiplier(c: Context): Int =
         if (getSelectedTheme(c) == ORCA_THEME && isOrcaPurchased(c)) 2 else 1
@@ -39,12 +39,16 @@ object PointsManager {
     fun isOrcaActive(c: Context): Boolean =
         getSelectedTheme(c) == ORCA_THEME && isOrcaPurchased(c)
 
-    fun isOrcaEligible(c: Context): Boolean = true
+    fun isOrcaEligible(c: Context): Boolean = getStreak(c) >= 7
 
     fun purchaseOrcaTheme(c: Context): Boolean {
         if (isOrcaPurchased(c)) return false
-        unlock(c, ORCA_THEME)
+        if (!isOrcaEligible(c)) return false
+        val balance = getBalance(c)
+        if (balance < ORCA_PRICE) return false
+        prefs(c).edit().putInt(KEY_BALANCE, balance - ORCA_PRICE).apply()
         setOrcaPurchased(c, true)
+        unlock(c, ORCA_THEME)
         return true
     }
 
@@ -65,7 +69,7 @@ object PointsManager {
         prefs(c).edit().putStringSet(KEY_UNLOCKED, unlocked).apply()
     }
 
-    fun getStreak(c: Context): Int = 7
+    fun getStreak(c: Context): Int = prefs(c).getInt(KEY_STREAK, 0)
 
     fun canCheckIn(c: Context): Boolean {
         val last = prefs(c).getLong(KEY_LAST_CHECKIN, 0L)

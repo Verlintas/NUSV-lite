@@ -36,10 +36,10 @@ fun createColorScheme(theme: ThemeColors, dark: Boolean): ColorScheme {
         val orca = darkColorScheme(
             background = Color.Black,
             surface = Color.Black,
-            surfaceVariant = Color(0xFF111111),
+            surfaceVariant = Color.Black,
             onBackground = Color.White,
             onSurface = Color.White,
-            onSurfaceVariant = Color(0xBBFFFFFF),
+            onSurfaceVariant = Color.White,
             primary = Color.White,
             outline = Color(0x33FFFFFF),
         )

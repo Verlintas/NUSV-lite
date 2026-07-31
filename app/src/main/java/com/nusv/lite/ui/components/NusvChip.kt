@@ -29,17 +29,23 @@ fun NusvChip(
     val haptic = LocalHapticFeedback.current
     val accent = MaterialTheme.colorScheme.primary
     val shape = RoundedCornerShape(100.dp)
+    val isOrca = MaterialTheme.colorScheme.background == Color.Black &&
+        MaterialTheme.colorScheme.onBackground == Color.White
 
     Box(
         modifier = modifier
             .clip(shape)
             .background(
-                if (selected) accent else Color.Transparent,
+                if (selected) {
+                    if (isOrca) Color.White else accent
+                } else Color.Transparent,
                 shape
             )
             .then(
-                if (selected) Modifier
-                else Modifier.border(1.dp, MaterialTheme.colorScheme.outline, shape)
+                if (selected) {
+                    if (isOrca) Modifier.border(1.dp, Color.White, shape)
+                    else Modifier
+                } else Modifier.border(1.dp, MaterialTheme.colorScheme.outline, shape)
             )
             .clickable(enabled = onClick != null) { haptic.performIfEnabled(); onClick?.invoke() }
             .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -48,7 +54,9 @@ fun NusvChip(
         Text(
             text = text,
             style = MaterialTheme.typography.labelLarge,
-            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+            color = if (selected) {
+                if (isOrca) Color.Black else Color.White
+            } else MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

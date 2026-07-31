@@ -232,7 +232,6 @@ private fun OrcaSection(
             .padding(16.dp),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-            Text("\uD83D\uDC19", fontSize = 36.sp)
             Spacer(Modifier.height(4.dp))
             Text(PointsManager.ORCA_THEME, style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold, color = Color.White)

@@ -1,6 +1,7 @@
 package com.nusv.lite.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.CircleShape
@@ -34,6 +36,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.DateRange
@@ -67,6 +70,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.Calculate
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Casino
 import androidx.compose.material.icons.outlined.DateRange
@@ -105,6 +109,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -257,6 +263,15 @@ val miniApps = listOf(
 val orcaHiddenTools = listOf(
     MiniApp("orcamatrix", "Matrix Rain", "\uD83D\uDDA4 Orca exclusive: digital rain", Icons.Outlined.Code, Icons.Filled.Code, Category.OTHER),
     MiniApp("orcasecret", "Secret Vault", "\uD83D\uDDA4 Orca exclusive: hidden notes", Icons.Outlined.Lock, Icons.Filled.Lock, Category.OTHER),
+    MiniApp("orca_clip", "Clipboard History", "\uD83D\uDDA4 Orca exclusive: recent copies at your fingertips", Icons.Outlined.ContentCopy, Icons.Filled.ContentCopy, Category.UTILITIES),
+    MiniApp("orca_habit", "Habit Tracker", "\uD83D\uDDA4 Orca exclusive: daily habits & streaks", Icons.Outlined.CheckCircle, Icons.Filled.CheckCircle, Category.UTILITIES),
+    MiniApp("orca_crypt", "Text Encrypt", "\uD83D\uDDA4 Orca exclusive: encrypt text with a passphrase", Icons.Outlined.Lock, Icons.Filled.Lock, Category.UTILITIES),
+    MiniApp("orca_speed", "Speed Reader", "\uD83D\uDDA4 Orca exclusive: read faster word by word", Icons.Outlined.PlayArrow, Icons.Filled.PlayArrow, Category.UTILITIES),
+    MiniApp("orca_color", "Color Picker", "\uD83D\uDDA4 Orca exclusive: pick & copy colors", Icons.Outlined.InvertColors, Icons.Filled.InvertColors, Category.UTILITIES),
+    MiniApp("orca_pwcheck", "Password Checker", "\uD83D\uDDA4 Orca exclusive: check your password strength", Icons.Outlined.Security, Icons.Filled.Security, Category.UTILITIES),
+    MiniApp("orca_diff", "Text Diff", "\uD83D\uDDA4 Orca exclusive: compare two texts", Icons.Outlined.Refresh, Icons.Filled.Refresh, Category.UTILITIES),
+    MiniApp("orca_gradient", "CSS Gradient", "\uD83D\uDDA4 Orca exclusive: generate CSS gradients", Icons.Outlined.InvertColors, Icons.Filled.InvertColors, Category.DEV_TOOLS),
+    MiniApp("orca_notes", "Quick Notes", "\uD83D\uDDA4 Orca exclusive: auto-save notes", Icons.Outlined.Description, Icons.Filled.Description, Category.UTILITIES),
 )
 
 var _pendingToolId: String? = null
@@ -297,13 +312,18 @@ fun DiscoverScreen() {
         )
         Spacer(Modifier.height(16.dp))
 
+        val isDsOrca = MaterialTheme.colorScheme.background == Color.Black &&
+            MaterialTheme.colorScheme.onBackground == Color.White
+        val dsBw = if (isDsOrca) 1.dp else 0.dp
+        val dsBc = if (isDsOrca) Color.White.copy(alpha = 0.5f) else Color.Transparent
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
                 .height(44.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(dsBw, dsBc, RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.CenterStart
         ) {
             Row(
@@ -346,13 +366,19 @@ fun DiscoverScreen() {
         ) {
             Category.entries.toList().forEach { cat ->
                 item {
+                val isCcOrca = MaterialTheme.colorScheme.background == Color.Black &&
+                    MaterialTheme.colorScheme.onBackground == Color.White
+                val ccBw = if (isCcOrca && selectedCategory != cat) 1.dp else 0.dp
+                val ccBc = if (isCcOrca && selectedCategory != cat) Color.White.copy(alpha = 0.5f) else Color.Transparent
                 Box(
                     modifier = Modifier
                         .background(
                             if (selectedCategory == cat) MaterialTheme.colorScheme.primary
+                            else if (isCcOrca) Color.Black
                             else MaterialTheme.colorScheme.surfaceVariant,
                             RoundedCornerShape(20.dp)
                         )
+                        .border(ccBw, ccBc, RoundedCornerShape(20.dp))
                         .clickable {
                             haptic.performIfEnabled()
                             selectedCategory = cat
@@ -494,6 +520,15 @@ fun DiscoverScreen() {
                     "quicktimer" -> QuickTimer(onBack = { activeApp = null })
                     "orcamatrix" -> MatrixRain(onBack = { activeApp = null })
                     "orcasecret" -> SecretVault(onBack = { activeApp = null })
+                    "orca_clip" -> ClipboardHistory(onBack = { activeApp = null })
+                    "orca_habit" -> HabitTracker(onBack = { activeApp = null })
+                    "orca_crypt" -> TextEncrypt(onBack = { activeApp = null })
+                    "orca_speed" -> SpeedReader(onBack = { activeApp = null })
+                    "orca_color" -> ColorPicker(onBack = { activeApp = null })
+                    "orca_pwcheck" -> PasswordChecker(onBack = { activeApp = null })
+                    "orca_diff" -> TextDiff(onBack = { activeApp = null })
+                    "orca_gradient" -> CssGradient(onBack = { activeApp = null })
+                    "orca_notes" -> QuickNotes(onBack = { activeApp = null })
                 }
             }
         }
@@ -520,11 +555,16 @@ private fun MiniAppRow(app: MiniApp, searchQuery: String = "", onClick: () -> Un
     val haptic = LocalHapticFeedback.current
     val strings = LocalAppStrings.current
     val interactionSource = remember { MutableInteractionSource() }
+    val isMrOrca = MaterialTheme.colorScheme.background == Color.Black &&
+        MaterialTheme.colorScheme.onBackground == Color.White
+    val mrBw = if (isMrOrca) 1.dp else 0.dp
+    val mrBc = if (isMrOrca) Color.White.copy(alpha = 0.5f) else Color.Transparent
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(if (isMrOrca) Color.Black else MaterialTheme.colorScheme.surfaceVariant)
+            .border(mrBw, mrBc, RoundedCornerShape(12.dp))
             .scalePress(interactionSource)
             .clickable(interactionSource = interactionSource, indication = null) { haptic.performIfEnabled(); onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp),
@@ -560,12 +600,17 @@ private fun MiniAppGridCard(app: MiniApp, searchQuery: String = "", onClick: () 
     val haptic = LocalHapticFeedback.current
     val strings = LocalAppStrings.current
     val interactionSource = remember { MutableInteractionSource() }
+    val isMgcOrca = MaterialTheme.colorScheme.background == Color.Black &&
+        MaterialTheme.colorScheme.onBackground == Color.White
+    val mgcBw = if (isMgcOrca) 1.dp else 0.dp
+    val mgcBc = if (isMgcOrca) Color.White.copy(alpha = 0.5f) else Color.Transparent
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(if (isMgcOrca) Color.Black else MaterialTheme.colorScheme.surfaceVariant)
+            .border(mgcBw, mgcBc, RoundedCornerShape(12.dp))
             .scalePress(interactionSource)
             .clickable(interactionSource = interactionSource, indication = null) { haptic.performIfEnabled(); onClick() },
         contentAlignment = Alignment.Center
@@ -3004,8 +3049,594 @@ private fun QuickTimer(onBack: () -> Unit) {
 
 
 
+// ─── Clipboard History (Orca exclusive) ─────────────
 
-// ─── Matrix Rain (Orca exclusive) ─────────────────────
+@Composable
+private fun ClipboardHistory(onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+    val ctx = LocalContext.current
+    val prefs = remember { ctx.getSharedPreferences("orca_clip", android.content.Context.MODE_PRIVATE) }
+    var items by remember { mutableStateOf(prefs.getString("history", "")?.split("\n")?.filter { it.isNotEmpty() } ?: emptyList()) }
+    val clipboard = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+
+    LaunchedEffect(Unit) {
+        val clip = clipboard.primaryClip
+        if (clip != null && clip.itemCount > 0) {
+            val text = clip.getItemAt(0).text?.toString() ?: return@LaunchedEffect
+            val existing = items.toMutableList()
+            existing.remove(text)
+            existing.add(0, text)
+            val trimmed = existing.take(30)
+            prefs.edit().putString("history", trimmed.joinToString("\n")).apply()
+            items = trimmed
+        }
+    }
+
+    fun copy(text: String) {
+        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("clip", text))
+    }
+
+    fun clear() {
+        prefs.edit().putString("history", "").apply()
+        items = emptyList()
+    }
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(20.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(36.dp).background(Color.White.copy(alpha = 0.1f), CircleShape).clickable { haptic.performIfEnabled(); onBack() }, contentAlignment = Alignment.Center) {
+                Text("\u2190", color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text("Clipboard History", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+            Spacer(Modifier.weight(1f))
+            if (items.isNotEmpty()) {
+                Box(Modifier.background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(8.dp)).clickable { haptic.performIfEnabled(); clear() }.padding(horizontal = 12.dp, vertical = 6.dp)) {
+                    Text("Clear", color = Color.White.copy(alpha = 0.6f), style = MaterialTheme.typography.labelLarge)
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Text("Tap any item to copy it back", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.4f))
+        Spacer(Modifier.height(16.dp))
+        if (items.isEmpty()) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("No clipboard history yet", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodyLarge)
+            }
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(items) { item ->
+                    Box(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color.White.copy(alpha = 0.06f)).border(1.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(12.dp)).clickable { haptic.performIfEnabled(); copy(item) }.padding(16.dp)
+                    ) {
+                        Text(item, color = Color.White, style = MaterialTheme.typography.bodyLarge, maxLines = 4, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ─── Habit Tracker (Orca exclusive) ──────────────────
+
+@Composable
+private fun HabitTracker(onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+    val ctx = LocalContext.current
+    val prefs = remember { ctx.getSharedPreferences("orca_habit", android.content.Context.MODE_PRIVATE) }
+    val today = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) }
+    var habits by remember { mutableStateOf(prefs.getString("habits", "")?.split("\n")?.filter { it.isNotEmpty() } ?: listOf("Read", "Exercise", "Meditate", "Code")) }
+    var done by remember { mutableStateOf(prefs.getString(today, "")?.split(",")?.filter { it.isNotEmpty() }?.toSet() ?: emptySet()) }
+    var adding by remember { mutableStateOf(false) }
+    var newHabit by remember { mutableStateOf("") }
+
+    fun saveDone(d: Set<String>) {
+        prefs.edit().putString(today, d.joinToString(",")).apply()
+        done = d
+    }
+
+    val streak = run {
+        val fmt = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+        val cal = java.util.Calendar.getInstance()
+        var s = 0
+        while (true) {
+            val day = fmt.format(cal.time)
+            val d = prefs.getString(day, "")?.split(",")?.filter { it.isNotEmpty() }?.toSet() ?: emptySet()
+            if (d.size >= habits.size) s++ else break
+            cal.add(java.util.Calendar.DAY_OF_YEAR, -1)
+        }
+        s
+    }
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(20.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(36.dp).background(Color.White.copy(alpha = 0.1f), CircleShape).clickable { haptic.performIfEnabled(); onBack() }, contentAlignment = Alignment.Center) {
+                Text("\u2190", color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text("Habit Tracker", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+            Spacer(Modifier.weight(1f))
+            Box(Modifier.background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(12.dp)).padding(horizontal = 12.dp, vertical = 6.dp)) {
+                Text("Streak: $streak", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            habits.forEach { h ->
+                val checked = h in done
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color.White.copy(alpha = if (checked) 0.1f else 0.04f)).border(1.dp, if (checked) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.08f), RoundedCornerShape(12.dp)).clickable { haptic.performIfEnabled(); val d = done.toMutableSet(); if (checked) d.remove(h) else d.add(h); saveDone(d) }.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(if (checked) "\u2713" else "\u25CB", color = if (checked) Color.White else Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.width(12.dp))
+                    Text(h, color = if (checked) Color.White else Color.White.copy(alpha = 0.5f), style = MaterialTheme.typography.bodyLarge)
+                }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        if (adding) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                BasicTextField(
+                    value = newHabit, onValueChange = { newHabit = it },
+                    modifier = Modifier.weight(1f).background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(10.dp)).padding(12.dp),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                    singleLine = true,
+                    decorationBox = { inner -> if (newHabit.isEmpty()) Text("Habit name", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodyLarge); inner() }
+                )
+                Spacer(Modifier.width(8.dp))
+                Box(Modifier.background(Color.White, RoundedCornerShape(10.dp)).clickable {
+                    haptic.performIfEnabled()
+                    if (newHabit.isNotBlank()) {
+                        habits = habits + newHabit.trim()
+                        prefs.edit().putString("habits", habits.joinToString("\n")).apply()
+                        newHabit = ""
+                        adding = false
+                    }
+                }.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                    Text("Add", color = Color.Black, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+                }
+            }
+        } else {
+            Box(Modifier.fillMaxWidth().background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(10.dp)).clickable { haptic.performIfEnabled(); adding = true }.padding(14.dp), contentAlignment = Alignment.Center) {
+                Text("+ Add Habit", color = Color.White.copy(alpha = 0.5f), style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+    }
+}
+
+// ─── Text Encrypt (Orca exclusive) ───────────────────
+
+private fun xorEncrypt(input: String, key: String): String {
+    val b = input.toByteArray()
+    val k = key.toByteArray()
+    if (k.isEmpty()) return ""
+    return android.util.Base64.encodeToString(ByteArray(b.size) { (b[it].toInt() xor k[it % k.size].toInt()).toByte() }, android.util.Base64.NO_WRAP)
+}
+
+private fun xorDecrypt(input: String, key: String): String {
+    return try {
+        val b = android.util.Base64.decode(input, android.util.Base64.NO_WRAP)
+        val k = key.toByteArray()
+        if (k.isEmpty()) return ""
+        String(ByteArray(b.size) { (b[it].toInt() xor k[it % k.size].toInt()).toByte() })
+    } catch (_: Exception) { "" }
+}
+
+@Composable
+private fun TextEncrypt(onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+    val ctx = LocalContext.current
+    var text by remember { mutableStateOf("") }
+    var pass by remember { mutableStateOf("") }
+    var result by remember { mutableStateOf("") }
+    var mode by remember { mutableStateOf("") }
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(20.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(36.dp).background(Color.White.copy(alpha = 0.1f), CircleShape).clickable { haptic.performIfEnabled(); onBack() }, contentAlignment = Alignment.Center) {
+                Text("\u2190", color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text("Text Encrypt", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+        Spacer(Modifier.height(8.dp))
+        Text("Encrypt or decrypt text with a passphrase", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.4f))
+        Spacer(Modifier.height(16.dp))
+
+        BasicTextField(
+            value = text, onValueChange = { text = it; result = ""; mode = "" },
+            modifier = Modifier.fillMaxWidth().height(100.dp).background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(12.dp)).padding(12.dp),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+            decorationBox = { inner -> if (text.isEmpty()) Text("Enter text to encrypt or ciphertext to decrypt", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodyLarge); inner() }
+        )
+        Spacer(Modifier.height(12.dp))
+        BasicTextField(
+            value = pass, onValueChange = { pass = it; result = ""; mode = "" },
+            modifier = Modifier.fillMaxWidth().background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(12.dp)).padding(12.dp),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+            singleLine = true,
+            decorationBox = { inner -> if (pass.isEmpty()) Text("Passphrase", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodyLarge); inner() },
+            visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation()
+        )
+        Spacer(Modifier.height(16.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(Modifier.weight(1f).background(Color.White, RoundedCornerShape(10.dp)).clickable {
+                haptic.performIfEnabled()
+                if (text.isNotBlank() && pass.isNotBlank()) { result = xorEncrypt(text, pass); mode = "enc" }
+            }.padding(vertical = 14.dp), contentAlignment = Alignment.Center) {
+                Text("Encrypt", color = Color.Black, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+            }
+            Box(Modifier.weight(1f).background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(10.dp)).clickable {
+                haptic.performIfEnabled()
+                if (text.isNotBlank() && pass.isNotBlank()) { result = xorDecrypt(text, pass); mode = "dec" }
+            }.padding(vertical = 14.dp), contentAlignment = Alignment.Center) {
+                Text("Decrypt", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+            }
+        }
+        if (result.isNotEmpty()) {
+            Spacer(Modifier.height(16.dp))
+            Text(if (mode == "enc") "Encrypted output:" else "Decrypted output:", color = Color.White.copy(alpha = 0.4f), style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.height(4.dp))
+            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color.White.copy(alpha = 0.06f)).border(1.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(12.dp)).clickable {
+                haptic.performIfEnabled()
+                val clipboard = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("crypt", result))
+            }.padding(16.dp)) {
+                Text(result, color = Color.White, style = MaterialTheme.typography.bodyLarge, maxLines = 5, overflow = TextOverflow.Ellipsis)
+            }
+            Text("Tap to copy", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.labelSmall)
+        }
+    }
+}
+
+// ─── Speed Reader (Orca exclusive) ──────────────────
+
+@Composable
+private fun SpeedReader(onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+    var source by remember { mutableStateOf("") }
+    var words by remember { mutableStateOf(emptyList<String>()) }
+    var index by remember { mutableIntStateOf(0) }
+    var playing by remember { mutableStateOf(false) }
+    var wpm by remember { mutableIntStateOf(300) }
+
+    LaunchedEffect(playing, index, wpm) {
+        if (playing && words.isNotEmpty() && index < words.size) {
+            delay((60000 / wpm).toLong())
+            index++
+        } else if (index >= words.size) {
+            playing = false
+        }
+    }
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(20.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(36.dp).background(Color.White.copy(alpha = 0.1f), CircleShape).clickable { haptic.performIfEnabled(); onBack() }, contentAlignment = Alignment.Center) {
+                Text("\u2190", color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text("Speed Reader", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+        Spacer(Modifier.height(8.dp))
+        Text("Paste text and read word by word at your pace", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.4f))
+        Spacer(Modifier.height(16.dp))
+
+        if (words.isEmpty()) {
+            BasicTextField(
+                value = source, onValueChange = { source = it },
+                modifier = Modifier.fillMaxWidth().weight(1f).background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(12.dp)).padding(16.dp),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                decorationBox = { inner -> if (source.isEmpty()) Text("Paste or type text here...", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodyLarge); inner() }
+            )
+            Spacer(Modifier.height(12.dp))
+            Box(Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(10.dp)).clickable {
+                haptic.performIfEnabled()
+                val w = source.trim().split("\\s+".toRegex()).filter { it.isNotEmpty() }
+                if (w.isNotEmpty()) { words = w; index = 0 }
+            }.padding(vertical = 14.dp), contentAlignment = Alignment.Center) {
+                Text("Start Reading", color = Color.Black, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+            }
+        } else {
+            Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                Text(
+                    text = if (index < words.size) words[index] else "\u2713 Done!",
+                    style = MaterialTheme.typography.displayLarge,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Text("${index + 1} / ${words.size}", color = Color.White.copy(alpha = 0.4f), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.align(Alignment.CenterHorizontally))
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("WPM", color = Color.White.copy(alpha = 0.5f), style = MaterialTheme.typography.labelLarge)
+                Slider(
+                    value = wpm.toFloat(), onValueChange = { wpm = it.toInt() },
+                    valueRange = 60f..1000f, steps = 0,
+                    modifier = Modifier.weight(1f),
+                    colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.2f))
+                )
+                Text("$wpm", color = Color.White, style = MaterialTheme.typography.labelLarge)
+            }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(Modifier.weight(1f).background(if (playing) Color.White.copy(alpha = 0.15f) else Color.White, RoundedCornerShape(10.dp)).clickable {
+                    haptic.performIfEnabled()
+                    if (index >= words.size) { index = 0 }
+                    playing = !playing
+                }.padding(vertical = 14.dp), contentAlignment = Alignment.Center) {
+                    Text(if (playing) "Pause" else "Play", color = if (playing) Color.White else Color.Black, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+                }
+                Box(Modifier.background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(10.dp)).clickable {
+                    haptic.performIfEnabled(); words = emptyList(); source = ""; index = 0; playing = false
+                }.padding(horizontal = 20.dp, vertical = 14.dp), contentAlignment = Alignment.Center) {
+                    Text("Reset", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+                }
+            }
+        }
+    }
+}
+
+// ─── Color Picker (Orca exclusive) ─────────────────
+
+@Composable
+private fun ColorPicker(onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+    val ctx = LocalContext.current
+    var r by remember { mutableIntStateOf(128) }
+    var g by remember { mutableIntStateOf(128) }
+    var b by remember { mutableIntStateOf(128) }
+    val color = Color(r / 255f, g / 255f, b / 255f)
+    val hex = "#%02X%02X%02X".format(r, g, b)
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(20.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(36.dp).background(Color.White.copy(alpha = 0.1f), CircleShape).clickable { haptic.performIfEnabled(); onBack() }, contentAlignment = Alignment.Center) {
+                Text("\u2190", color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text("Color Picker", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+        Spacer(Modifier.height(16.dp))
+        Box(Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(16.dp)).background(color)) {
+            Box(Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(16.dp)).padding(12.dp), contentAlignment = Alignment.Center) {
+                Text(hex, color = if (r + g + b < 384) Color.White else Color.Black, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineMedium)
+            }
+        }
+        Spacer(Modifier.height(24.dp))
+        listOf("R" to r, "G" to g, "B" to b).forEach { (label, value) ->
+            val max = 255
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(label, color = Color.White.copy(alpha = 0.6f), style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(24.dp))
+                Slider(value = value.toFloat(), onValueChange = { if (label == "R") r = it.toInt(); if (label == "G") g = it.toInt(); if (label == "B") b = it.toInt() }, valueRange = 0f..255f, modifier = Modifier.weight(1f), colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.2f)))
+                Text("$value", color = Color.White, style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(40.dp))
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+        val clipboard = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(Modifier.weight(1f).background(Color.White, RoundedCornerShape(10.dp)).clickable { haptic.performIfEnabled(); clipboard.setPrimaryClip(android.content.ClipData.newPlainText("hex", hex)) }.padding(vertical = 14.dp), contentAlignment = Alignment.Center) {
+                Text("Copy HEX", color = Color.Black, fontWeight = FontWeight.Bold)
+            }
+            Box(Modifier.weight(1f).background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(10.dp)).clickable { haptic.performIfEnabled(); clipboard.setPrimaryClip(android.content.ClipData.newPlainText("rgb", "rgb($r, $g, $b)")) }.padding(vertical = 14.dp), contentAlignment = Alignment.Center) {
+                Text("Copy RGB", color = Color.White, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+// ─── Password Checker (Orca exclusive) ─────────────
+
+@Composable
+private fun PasswordChecker(onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+    var pw by remember { mutableStateOf("") }
+    val hasUpper = pw.any { it.isUpperCase() }
+    val hasLower = pw.any { it.isLowerCase() }
+    val hasDigit = pw.any { it.isDigit() }
+    val hasSym = pw.any { !it.isLetterOrDigit() }
+    val lenScore = when { pw.length >= 14 -> 3; pw.length >= 10 -> 2; pw.length >= 6 -> 1; else -> 0 }
+    val score = lenScore + listOf(hasUpper, hasLower, hasDigit, hasSym).count { it }
+    val maxScore = 7
+    val fraction = score.toFloat() / maxScore
+    val label = when { score >= 6 -> "Strong"; score >= 4 -> "Medium"; else -> "Weak" }
+    val barColor = when { score >= 6 -> Color(0xFF4CAF50); score >= 4 -> Color(0xFFFFC107); else -> Color(0xFFF44336) }
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(20.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(36.dp).background(Color.White.copy(alpha = 0.1f), CircleShape).clickable { haptic.performIfEnabled(); onBack() }, contentAlignment = Alignment.Center) {
+                Text("\u2190", color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text("Password Checker", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+        Spacer(Modifier.height(8.dp))
+        Text("Type a password to check its strength", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.4f))
+        Spacer(Modifier.height(16.dp))
+        BasicTextField(
+            value = pw, onValueChange = { pw = it },
+            modifier = Modifier.fillMaxWidth().background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(12.dp)).padding(16.dp),
+            textStyle = MaterialTheme.typography.headlineMedium.copy(color = Color.White, letterSpacing = 2.sp),
+            singleLine = true,
+            visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+            decorationBox = { inner -> if (pw.isEmpty()) Text("Your password", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodyLarge); inner() }
+        )
+        if (pw.isNotEmpty()) {
+            Spacer(Modifier.height(20.dp))
+            Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color.White.copy(alpha = 0.1f)).then(Modifier.fillMaxWidth(fraction).background(barColor, RoundedCornerShape(4.dp)).align(Alignment.Start)))
+            Spacer(Modifier.height(8.dp))
+            Text("$label  ($score/$maxScore)", color = barColor, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(12.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("Uppercase" to hasUpper, "Lowercase" to hasLower, "Digit (0-9)" to hasDigit, "Symbol (!@#\$%...)" to hasSym, "Length ≥ 6" to (pw.length >= 6), "Length ≥ 10" to (pw.length >= 10), "Length ≥ 14" to (pw.length >= 14)).forEach { (desc, ok) ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(if (ok) "\u2713" else "\u2717", color = if (ok) Color(0xFF4CAF50) else Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodyLarge)
+                        Spacer(Modifier.width(8.dp))
+                        Text(desc, color = if (ok) Color.White else Color.White.copy(alpha = 0.4f), style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ─── Text Diff (Orca exclusive) ────────────────────
+
+@Composable
+private fun TextDiff(onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+    var t1 by remember { mutableStateOf("") }
+    var t2 by remember { mutableStateOf("") }
+    val l1 = t1.split("\n")
+    val l2 = t2.split("\n")
+    val maxLines = maxOf(l1.size, l2.size)
+    val diffs = (0 until maxLines).map { i ->
+        val a = l1.getOrElse(i) { "" }
+        val b = l2.getOrElse(i) { "" }
+        when {
+            i >= l1.size -> 2 // added
+            i >= l2.size -> -1 // removed
+            a != b -> 1 // changed
+            else -> 0 // same
+        }
+    }
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(20.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(36.dp).background(Color.White.copy(alpha = 0.1f), CircleShape).clickable { haptic.performIfEnabled(); onBack() }, contentAlignment = Alignment.Center) {
+                Text("\u2190", color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text("Text Diff", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+        Spacer(Modifier.height(8.dp))
+        Text("Paste two texts to see differences", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.4f))
+        Spacer(Modifier.height(12.dp))
+
+        Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BasicTextField(value = t1, onValueChange = { t1 = it },
+                modifier = Modifier.weight(1f).background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(10.dp)).padding(8.dp),
+                textStyle = MaterialTheme.typography.bodySmall.copy(color = Color.White),
+                decorationBox = { inner -> if (t1.isEmpty()) Text("Original", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodySmall); inner() })
+            BasicTextField(value = t2, onValueChange = { t2 = it },
+                modifier = Modifier.weight(1f).background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(10.dp)).padding(8.dp),
+                textStyle = MaterialTheme.typography.bodySmall.copy(color = Color.White),
+                decorationBox = { inner -> if (t2.isEmpty()) Text("Modified", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodySmall); inner() })
+        }
+        if (t1.isNotEmpty() || t2.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            Text("Differences:", color = Color.White.copy(alpha = 0.5f), style = MaterialTheme.typography.labelLarge)
+            Spacer(Modifier.height(4.dp))
+            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                itemsIndexed(diffs) { i, d ->
+                    if (d != 0) {
+                        val prefix = when (d) { -1 -> "-"; 1 -> "~"; 2 -> "+"; else -> "" }
+                        val line = l1.getOrElse(i) { l2.getOrElse(i) { "" } }
+                        val bg = when (d) { -1 -> Color(0xFFF44336).copy(alpha = 0.15f); 1 -> Color(0xFFFFC107).copy(alpha = 0.15f); 2 -> Color(0xFF4CAF50).copy(alpha = 0.15f); else -> Color.Transparent }
+                        Text("$prefix L${i+1}: $line", color = Color.White, style = MaterialTheme.typography.bodySmall, modifier = Modifier.fillMaxWidth().background(bg, RoundedCornerShape(4.dp)).padding(horizontal = 8.dp, vertical = 4.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ─── CSS Gradient (Orca exclusive) ──────────────────
+
+private fun colorToHex(c: Color): String = "#%02X%02X%02X".format((c.red * 255).toInt(), (c.green * 255).toInt(), (c.blue * 255).toInt())
+
+@Composable
+private fun CssGradient(onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+    val ctx = LocalContext.current
+    var cr by remember { mutableIntStateOf(124) }; var cg by remember { mutableIntStateOf(58) }; var cb by remember { mutableIntStateOf(237) }
+    var c2r by remember { mutableIntStateOf(255) }; var c2g by remember { mutableIntStateOf(45) }; var c2b by remember { mutableIntStateOf(120) }
+    var angle by remember { mutableIntStateOf(90) }
+    val col1 = Color(cr / 255f, cg / 255f, cb / 255f)
+    val col2 = Color(c2r / 255f, c2g / 255f, c2b / 255f)
+    val css = "background: linear-gradient(${angle}deg, ${colorToHex(col1)}, ${colorToHex(col2)});"
+    val clipboard = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(20.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(36.dp).background(Color.White.copy(alpha = 0.1f), CircleShape).clickable { haptic.performIfEnabled(); onBack() }, contentAlignment = Alignment.Center) {
+                Text("\u2190", color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text("CSS Gradient", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+        Spacer(Modifier.height(12.dp))
+        Box(Modifier.fillMaxWidth().height(80.dp).clip(RoundedCornerShape(12.dp)).background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(col1, col2), start = androidx.compose.ui.geometry.Offset.Zero, end = androidx.compose.ui.geometry.Offset(1000f, 0f))))
+        Spacer(Modifier.height(16.dp))
+        Text("Color 1", color = Color.White.copy(alpha = 0.5f), style = MaterialTheme.typography.labelLarge)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Slider(value = cr.toFloat(), onValueChange = { cr = it.toInt() }, valueRange = 0f..255f, modifier = Modifier.weight(1f), colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.2f)))
+            Text("R:$cr", color = Color.White, style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(48.dp))
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Slider(value = cg.toFloat(), onValueChange = { cg = it.toInt() }, valueRange = 0f..255f, modifier = Modifier.weight(1f), colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.2f)))
+            Text("G:$cg", color = Color.White, style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(48.dp))
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Slider(value = cb.toFloat(), onValueChange = { cb = it.toInt() }, valueRange = 0f..255f, modifier = Modifier.weight(1f), colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.2f)))
+            Text("B:$cb", color = Color.White, style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(48.dp))
+        }
+        Text("Color 2", color = Color.White.copy(alpha = 0.5f), style = MaterialTheme.typography.labelLarge)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Slider(value = c2r.toFloat(), onValueChange = { c2r = it.toInt() }, valueRange = 0f..255f, modifier = Modifier.weight(1f), colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.2f)))
+            Text("R:$c2r", color = Color.White, style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(48.dp))
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Slider(value = c2g.toFloat(), onValueChange = { c2g = it.toInt() }, valueRange = 0f..255f, modifier = Modifier.weight(1f), colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.2f)))
+            Text("G:$c2g", color = Color.White, style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(48.dp))
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Slider(value = c2b.toFloat(), onValueChange = { c2b = it.toInt() }, valueRange = 0f..255f, modifier = Modifier.weight(1f), colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.2f)))
+            Text("B:$c2b", color = Color.White, style = MaterialTheme.typography.labelSmall, modifier = Modifier.width(48.dp))
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Angle: $angle\u00B0", color = Color.White.copy(alpha = 0.5f), style = MaterialTheme.typography.labelLarge)
+            Slider(value = angle.toFloat(), onValueChange = { angle = it.toInt() }, valueRange = 0f..360f, modifier = Modifier.weight(1f), colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.2f)))
+        }
+        Spacer(Modifier.height(12.dp))
+        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color.White.copy(alpha = 0.06f)).border(1.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(12.dp)).clickable { haptic.performIfEnabled(); clipboard.setPrimaryClip(android.content.ClipData.newPlainText("css", css)) }.padding(16.dp)) {
+            Text(css, color = Color.White, style = MaterialTheme.typography.bodySmall)
+        }
+        Text("Tap to copy CSS", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.labelSmall)
+    }
+}
+
+// ─── Quick Notes (Orca exclusive) ──────────────────
+
+@Composable
+private fun QuickNotes(onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+    val ctx = LocalContext.current
+    val prefs = remember { ctx.getSharedPreferences("orca_notes", android.content.Context.MODE_PRIVATE) }
+    var text by remember { mutableStateOf(prefs.getString("notes", "") ?: "") }
+
+    Column(Modifier.fillMaxSize().background(Color.Black).padding(20.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(36.dp).background(Color.White.copy(alpha = 0.1f), CircleShape).clickable { haptic.performIfEnabled(); onBack() }, contentAlignment = Alignment.Center) {
+                Text("\u2190", color = Color.White, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text("Quick Notes", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+        Spacer(Modifier.height(8.dp))
+        Text("Auto-saves as you type", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.4f))
+        Spacer(Modifier.height(16.dp))
+        BasicTextField(
+            value = text, onValueChange = { text = it; prefs.edit().putString("notes", it).apply() },
+            modifier = Modifier.fillMaxWidth().weight(1f).background(Color.White.copy(alpha = 0.06f), RoundedCornerShape(12.dp)).padding(16.dp),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+            decorationBox = { inner -> if (text.isEmpty()) Text("Write something...", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.bodyLarge); inner() }
+        )
+        Spacer(Modifier.height(8.dp))
+        Text("${text.length} characters", color = Color.White.copy(alpha = 0.3f), style = MaterialTheme.typography.labelSmall)
+    }
+}
 
 @Composable
 private fun MatrixRain(onBack: () -> Unit) {

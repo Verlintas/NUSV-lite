@@ -1,6 +1,7 @@
 package com.nusv.lite.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -137,6 +138,10 @@ fun HomeScreen(
         }
 
         item {
+            val isShOrca = MaterialTheme.colorScheme.background == Color.Black &&
+                MaterialTheme.colorScheme.onBackground == Color.White
+            val shBw = if (isShOrca) 1.dp else 0.dp
+            val shBc = if (isShOrca) Color.White.copy(alpha = 0.5f) else Color.Transparent
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -144,6 +149,7 @@ fun HomeScreen(
                     .height(48.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .border(shBw, shBc, RoundedCornerShape(12.dp))
                     .clickable { haptic.performIfEnabled(); onSearchClick() },
                 contentAlignment = Alignment.CenterStart
             ) {
@@ -208,12 +214,17 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(recentApps) { app ->
+                        val isRtOrca = MaterialTheme.colorScheme.background == Color.Black &&
+                            MaterialTheme.colorScheme.onBackground == Color.White
+                        val rtBw = if (isRtOrca) 1.dp else 0.dp
+                        val rtBc = if (isRtOrca) Color.White.copy(alpha = 0.5f) else Color.Transparent
                         Box(
                             modifier = Modifier
                                 .width(120.dp)
                                 .height(80.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .border(rtBw, rtBc, RoundedCornerShape(12.dp))
                                 .clickable {
                                     haptic.performIfEnabled()
                                     ClickTracker.increment(ctx, app.id)
@@ -268,6 +279,8 @@ fun FeaturedCard(
     val interactionSource = remember { MutableInteractionSource() }
     val categoryColor = Color(category?.color ?: 0xFFFF2D78)
     val isDark = isSystemInDarkTheme()
+    val isOrca = MaterialTheme.colorScheme.background == Color.Black &&
+        MaterialTheme.colorScheme.onBackground == Color.White
 
     Box(
         modifier = modifier
@@ -275,7 +288,11 @@ fun FeaturedCard(
             .scalePress(interactionSource)
             .clip(RoundedCornerShape(12.dp))
             .background(
-                if (isDark) Brush.linearGradient(
+                if (isOrca) Brush.linearGradient(
+                    colors = listOf(Color.Black, Color.Black),
+                    start = Offset.Zero,
+                    end = Offset(1000f, 1000f)
+                ) else if (isDark) Brush.linearGradient(
                     colors = listOf(
                         categoryColor.copy(alpha = 0.8f),
                         categoryColor.copy(alpha = 0.3f),
@@ -292,6 +309,7 @@ fun FeaturedCard(
                     end = Offset(1000f, 1000f)
                 )
             )
+            .let { mod -> if (isOrca) mod.border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(12.dp)) else mod }
             .clickable(interactionSource = interactionSource, indication = null) { haptic.performIfEnabled(); onClick() }
             .padding(20.dp),
         contentAlignment = Alignment.BottomStart

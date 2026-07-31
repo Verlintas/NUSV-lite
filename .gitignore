@@ -8,6 +8,9 @@ local.properties
 *.apk.idsig
 *.apk.aab
 
+# Internal test builds (never pushed)
+release/*-test.apk
+
 # macOS
 .DS_Store
 
